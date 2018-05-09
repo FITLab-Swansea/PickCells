@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>imgs/clock.png</file>
+        <file>imgs/photos.png</file>
+        <file>imgs/close.png</file>
+        <file>imgs/picture.png</file>
+        <file>imgs/settings.png</file>
+    </qresource>
+</RCC>
