@@ -29,4 +29,5 @@ dependencies {
     compile ('io.socket:socket.io-client:0.8.3') {
         exclude group: 'org.json', module: 'json'
     }
+    compile 'no.nordicsemi.android.support.v18:scanner:1.0.0'
 }

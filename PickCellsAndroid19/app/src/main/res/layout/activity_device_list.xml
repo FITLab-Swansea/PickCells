@@ -17,16 +17,27 @@
         android:textIsSelectable="false" />
 
     <Button
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Paired Devices"
-        android:id="@+id/button"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="#e75238" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="196dp"
+        android:layout_marginStart="196dp"
+        android:background="#e75238"
+        android:text="Paired Devices" />
+
+    <Button
+        android:id="@+id/skip_button"
+        android:layout_width="193dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="#e75238"
+        android:text="Skip" />
 
     <ListView
         android:layout_width="wrap_content"

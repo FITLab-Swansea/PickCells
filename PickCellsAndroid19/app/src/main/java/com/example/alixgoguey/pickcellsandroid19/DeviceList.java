@@ -23,6 +23,7 @@ public class DeviceList extends Activity
 {
     //widgets
     Button btnPaired;
+    Button btnSkip;
     ListView devicelist;
     //Bluetooth
     private BluetoothAdapter myBluetooth = null;
@@ -37,6 +38,7 @@ public class DeviceList extends Activity
 
         //Calling widgets
         btnPaired = (Button)findViewById(R.id.button);
+        btnSkip = (Button)findViewById(R.id.skip_button);
         devicelist = (ListView)findViewById(R.id.listView);
 
         //if the device has bluetooth
@@ -59,12 +61,23 @@ public class DeviceList extends Activity
 
         btnPaired.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v){
                 pairedDevicesList();
             }
         });
 
+        btnSkip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                skip();
+            }
+        });
+
+    }
+
+    private void skip(){
+        Intent i = new Intent(DeviceList.this, MainActivity.class);
+        startActivity(i);
     }
 
     private void pairedDevicesList()

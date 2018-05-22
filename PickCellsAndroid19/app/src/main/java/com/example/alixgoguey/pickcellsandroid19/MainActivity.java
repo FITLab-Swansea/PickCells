@@ -89,8 +89,12 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private BluetoothGattCharacteristic tx;
     private BluetoothGattCharacteristic rx;
 
+    int activeSides[] = new int[5];
 
 
+
+
+    @SuppressLint("MissingPermission")
     public String getDeviceIMEI() {
         if (IMEI == null) {
             IMEI = "";
@@ -118,6 +122,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
         // Grab references to UI elements.
         messages = (TextView) findViewById(R.id.messages);
+        messages.setText("No Active Side");
         input = (EditText) findViewById(R.id.editText);
 
         buttonSend = (Button) findViewById(R.id.button);
@@ -129,9 +134,10 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         layout.setOnTouchListener(this);
 
         Intent newint = getIntent();
-        address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS); //receive the address of the bluetooth device
-
-        new ConnectBT().execute(); //Call the class to connect
+        if (newint.getStringExtra(DeviceList.EXTRA_ADDRESS)!=null) {
+            address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS); //receive the address of the bluetooth device
+            new ConnectBT().execute(); //Call the class to connect
+        }
         final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
                 .findViewById(android.R.id.content)).getChildAt(0);
         bluetoothIn = new Handler() {
@@ -146,12 +152,35 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                     int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
                     if (endOfLineIndex > 0) {                                           // make sure there data before ~
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-                        Log.v("Handler", readMessage);
+                        //Log.v("Handler", "readMessage: "+readMessage);
                         if (recDataString.charAt(0) == '#')								//if it starts with # we know it is what we are looking for
                         {
-                            String sensor0 = recDataString.substring(1,dataInPrint.length());             //get sensor value from string between indices 1-5
-                            Log.v("Handler", sensor0);
-                            messages.setText("Direction: " + sensor0);	//update the textviews with sensor values
+                            if (recDataString.charAt(2) == ':')
+                            {
+                                String side = recDataString.substring(1,2);             //get sensor value from string between indices 1-5
+                                String attachDirection = recDataString.substring(3, dataInPrint.length());             //get sensor value from string between indices 1-5
+//                                Log.v("Handler", cubeID + " : "+attachDirection);
+                                /// Log.v("Handler", "Active Side: " + side + "= " + attachDirection);
+
+                                activeSides[Integer.parseInt(side)] = Integer.parseInt(attachDirection);
+                                newCubeAdd(Integer.parseInt(side));
+
+                                int emptySides = 0;
+                                for (int i = 0; i < 4; i++){
+                                    Log.v("Handler", "Active Side: " + activeSides[i]);
+                                    if (activeSides[i] == 1) {
+                                        messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3]);
+
+                                    } else {
+                                        emptySides++;
+                                    }
+                                }
+                                if (emptySides == 4){
+                                    messages.setText("No Active Side");
+                                }
+                                emptySides=0;
+                            }
+
 //                            viewGroup.setBackgroundColor(Color.argb(255, Integer.parseInt(sensor0), 0, 0));
 
                         }
@@ -163,7 +192,11 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
 
         try {
-            socket = IO.socket("http://192.168.43.74:9000");
+
+            socket = IO.socket("http://172.20.10.2:9000");
+            // socket = IO.socket("http://192.168.43.74:9000");
+            // socket = IO.socket("http://192.168.0.26:9000");
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -308,6 +341,39 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         socket.emit("clicked", obj);
     }
 
+    public String indexToChar(int index){
+        switch (index){
+            case 0:
+                return "North";
+            case 1:
+                return "East";
+            case 2:
+                return "South";
+            case 3:
+                return "West";
+            case 4:
+                return "Bottom";
+        }
+        return "";
+    }
+
+
+    public void newCubeAdd(int side) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("IMEI", getDeviceIMEI());
+            obj.put("side", indexToChar(side));
+            obj.put("active", activeSides[side]);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        socket.emit("sideChange", obj);
+    }
+
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         try {
@@ -329,7 +395,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             e.printStackTrace();
         }
 
-
+        // TODO: add code to send the active side
         if (motionEvent.getPointerId(motionEvent.getActionIndex()) == 0) {
             // Sending an object
             JSONObject obj = new JSONObject();
@@ -348,6 +414,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             //Log.d("IOIO", " touch frame");
             socket.emit("touchframe", obj);
         }
+
+        newCubeAdd(2);
         return true;
     }
 
