@@ -38,6 +38,12 @@ io.on('connection', function(socket){
       datelog("Client ("+data["IMEI"]+")         y: "+data["y"]);
       datelog("Client ("+data["IMEI"]+")      type: "+data["type"]);
   });
+    
+  socket.on('sideChange', function(data) {
+      datelog("Client ("+data["IMEI"]+") says: sideChange!");
+      datelog("Client ("+data["IMEI"]+")         side: "+data["side"]);
+      datelog("Client ("+data["IMEI"]+")         active: "+data["active"]);
+  });
 
   socket.on('disconnect' , function() {
       datelog("Client disconnected");
