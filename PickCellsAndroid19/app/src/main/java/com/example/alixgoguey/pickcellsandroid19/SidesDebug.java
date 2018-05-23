@@ -105,8 +105,8 @@ public class SidesDebug extends Activity implements View.OnClickListener{
                 runOnUiThread(new Runnable() {
                     public void run() {
                         String s = "id: ";
-                        Log.v("id: ", s + "\n" + obj_str);
-                        cubeIDLable.setText(s + obj_str);
+                        Log.v("id: ", s + "\n" + getDeviceIMEI());
+                        cubeIDLable.setText(s + getDeviceIMEI());
 
                     }
                 });
