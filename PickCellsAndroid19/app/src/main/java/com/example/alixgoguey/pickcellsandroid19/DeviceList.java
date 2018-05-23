@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +25,7 @@ public class DeviceList extends Activity
     //widgets
     Button btnPaired;
     Button btnSkip;
+    Button btnDebug;
     ListView devicelist;
     //Bluetooth
     private BluetoothAdapter myBluetooth = null;
@@ -40,6 +42,7 @@ public class DeviceList extends Activity
         btnPaired = (Button)findViewById(R.id.button);
         btnSkip = (Button)findViewById(R.id.skip_button);
         devicelist = (ListView)findViewById(R.id.listView);
+        btnDebug = (Button)findViewById(R.id.debug_button);
 
         //if the device has bluetooth
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
@@ -72,7 +75,22 @@ public class DeviceList extends Activity
                 skip();
             }
         });
+        btnDebug.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
 
+                debug();
+            }
+        });
+
+
+
+    }
+
+    private void debug(){
+        Log.v("onClick", "debug()");
+        Intent i = new Intent(DeviceList.this, SidesDebug.class);
+        startActivity(i);
     }
 
     private void skip(){

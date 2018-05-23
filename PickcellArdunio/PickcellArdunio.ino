@@ -5,6 +5,9 @@ int sensorValue[5];
 int sensorMax[5]; 
 int sensorMin[5]; 
 
+int dialValueCurrent;
+int dialValueNew;
+
 void setup() {  
   Serial.begin(9600);
   // bluetooth serial
@@ -14,6 +17,9 @@ void setup() {
   pinMode(A2, OUTPUT);
   pinMode(A3, OUTPUT);
   pinMode(A4, OUTPUT);
+  pinMode(A5, OUTPUT);
+  dialValueNew = analogRead(A5);
+  dialValueCurrent = analogRead(A5);
   for (int i=0; i<5; i++) {
     while (millis() < 5000*i+1) {
       readLRDValuesRaw();
@@ -26,7 +32,7 @@ void setup() {
     }
     
   }
-
+  //Serial.print("Ready!");
 }
 
 void debugLDRs() {
@@ -79,6 +85,13 @@ void checkSides(){
   }
 }
 
+void sendDialValue(){
+    Serial.print('*');
+    Serial.print(dialValueCurrent);
+    Serial.print('~'); //used as an end of transmission character - used in app for string length
+    Serial.println();
+}
+
 void sendValue(int cubeId){
     Serial.print('#');
     Serial.print(cubeId);
@@ -88,9 +101,19 @@ void sendValue(int cubeId){
     Serial.println();
 }
 
+void readDial(){
+    dialValueNew = map (analogRead(A5), 1, 980, 0, 255);
+    if (dialValueCurrent != dialValueNew){
+      dialValueCurrent = dialValueNew;
+      sendDialValue();
+    }
+}
+
 void loop() {
     readLRDValues();
 //    Serial.println(ldrs[4]);
+
+    readDial();
 
     // debugLDRs();
     checkSides();

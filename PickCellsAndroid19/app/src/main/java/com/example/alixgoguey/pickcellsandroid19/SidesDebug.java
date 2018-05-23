@@ -67,7 +67,8 @@ public class SidesDebug extends Activity implements View.OnClickListener{
 
         try {
 
-            socket = IO.socket("http://172.20.10.2:9000");
+//            socket = IO.socket("http://172.20.10.2:9000");
+            socket = IO.socket("http://172.20.10.11:9000");
             // socket = IO.socket("http://192.168.43.74:9000");
             // socket = IO.socket("http://192.168.0.26:9000");
 

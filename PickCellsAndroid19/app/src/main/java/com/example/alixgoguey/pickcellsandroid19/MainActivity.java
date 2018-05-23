@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -74,6 +73,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     String obj_str;
 
     String IMEI = null;
+
+    int dialValue;
 
 //    CellSensor cell_sensor = null;
 
@@ -152,18 +153,21 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                     int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
                     if (endOfLineIndex > 0) {                                           // make sure there data before ~
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-                        //Log.v("Handler", "readMessage: "+readMessage);
-                        if (recDataString.charAt(0) == '#')								//if it starts with # we know it is what we are looking for
-                        {
-                            if (recDataString.charAt(2) == ':')
-                            {
-                                String side = recDataString.substring(1,2);             //get sensor value from string between indices 1-5
-                                String attachDirection = recDataString.substring(3, dataInPrint.length());             //get sensor value from string between indices 1-5
-//                                Log.v("Handler", cubeID + " : "+attachDirection);
-                                /// Log.v("Handler", "Active Side: " + side + "= " + attachDirection);
+                        // Log.v("Handler", "readMessage: "+readMessage);
+                        if (recDataString.charAt(0) == '#')	{
+                            if (recDataString.charAt(2) == ':') {
+                                String side = recDataString.substring(1,dataInPrint.length());
+                                String attachDirection = recDataString.substring(3, dataInPrint.length());
+                                // Log.v("Handler", cubeID + " : "+attachDirection);
+                                // Log.v("Handler", "Active Side: " + side + "= " + attachDirection);
 
-                                activeSides[Integer.parseInt(side)] = Integer.parseInt(attachDirection);
-                                newCubeAdd(Integer.parseInt(side));
+                                try {
+                                    activeSides[Integer.parseInt(side)] = Integer.parseInt(attachDirection);
+                                    newCubeAdd(Integer.parseInt(side));
+                                } catch () {
+                                    
+                                }
+
 
                                 int emptySides = 0;
                                 for (int i = 0; i < 4; i++){
@@ -183,6 +187,11 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
 //                            viewGroup.setBackgroundColor(Color.argb(255, Integer.parseInt(sensor0), 0, 0));
 
+                        }
+                        if (recDataString.charAt(0) == '*')	{
+                            String dial = recDataString.substring(1,2);
+                            Log.v("Handler", "Dial Value: " + dialValue);
+                            dialValue = Integer.parseInt(dial);
                         }
                         recDataString.delete(0, recDataString.length()); 					//clear all string data
                     }
