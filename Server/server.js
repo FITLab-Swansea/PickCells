@@ -113,12 +113,12 @@ function update_device(k) {
         device['max_z'] = device['connections'][con]['z'];
         once = true;
       } else {
-        device['min_x'] = min(device['connections'][con]['x'],device['min_x']);
-        device['max_x'] = max(device['connections'][con]['x'],device['max_x']);
-        device['min_y'] = min(device['connections'][con]['y'],device['min_y']);
-        device['max_y'] = max(device['connections'][con]['y'],device['max_y']);
-        device['min_z'] = min(device['connections'][con]['z'],device['min_z']);
-        device['max_z'] = max(device['connections'][con]['z'],device['max_z']);
+        device['min_x'] = Math.min(device['connections'][con]['x'],device['min_x']);
+        device['max_x'] = Math.max(device['connections'][con]['x'],device['max_x']);
+        device['min_y'] = Math.min(device['connections'][con]['y'],device['min_y']);
+        device['max_y'] = Math.max(device['connections'][con]['y'],device['max_y']);
+        device['min_z'] = Math.min(device['connections'][con]['z'],device['min_z']);
+        device['max_z'] = Math.max(device['connections'][con]['z'],device['max_z']);
       }
     }
     configuration['devices'].splice(k, 0, device);
@@ -185,12 +185,112 @@ function update_configuration(connection,watch) {
     // data["IMEI"]
     // data["side"]   // "North" "East" "South" "West" "Bottom"
     // data["active"] // "false" "true"
+
+    while (side_msgs.length) {
+      var side_msg = side_msgs.pop();
+      var opposite = side_msg["side"];
+      if (opposite == "North") {
+        opposite = "South";
+      } else if (opposite == "South") {
+        opposite = "North";
+      } else if (opposite == "East") {
+        opposite = "West";
+      } else if (opposite == "West") {
+        opposite = "East";
+      }
+
+      var opp_msg = null;
+      for (var k = 0; k < side_msgs.length; k++) {
+        if ((side_msgs[k]["side"] == opposite) && (side_msgs[k]["active"] == side_msg["active"])) {
+          opp_msg = side_msgs[k];
+          break;
+        }
+      }
+
+      if (opp_msg != null) {
+        if (side_msg["active"]) {
+          // check if devices already in the same
+          // if not merge
+          var device_index_a = -1;
+          for (var i = 0; i < configuration['devices'].length; i++) {
+            if (side_msg["IMEI"] in configuration['devices'][i]['connections']) {
+              device_index_a = i;
+              break;
+            }
+          }
+          var device_index_b = -1;
+          for (var i = 0; i < configuration['devices'].length; i++) {
+            if (opp_msg["IMEI"] in configuration['devices'][i]['connections']) {
+              device_index_b = i;
+              break;
+            }
+          }
+
+          if (device_index_a == device_index_b) {
+            configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]][side_msg["side"][0]] = opp_msg["IMEI"];
+            configuration['devices'][device_index_a]['connections'][opp_msg["IMEI"]][opp_msg["side"][0]] = side_msg["IMEI"];
+
+            // update the connections
+            update_device(device_index_a);
+          } else {
+            var to_merge = configuration['devices'][device_index_b];
+            configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]][side_msg["side"][0]] = opp_msg["IMEI"];
+            var dx = 0;
+            var dy = 0;
+            var dz = 0;
+            if (side_msg["side"][0] == 'N') {
+              dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x'];
+              dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y']-1;
+              dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z'];
+            } else if (side_msg["side"][0] == 'S') {
+              dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x'];
+              dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y']+1;
+              dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z'];
+            } else if (side_msg["side"][0] == 'W') {
+              dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x']-1;
+              dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y'];
+              dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z'];
+            } else if (side_msg["side"][0] == 'E') {
+              dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x']+1;
+              dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y'];
+              dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z'];
+            }
+            dx -= to_merge['connections'][opp_msg["IMEI"]]['x'];
+            dy -= to_merge['connections'][opp_msg["IMEI"]]['y'];
+            dz -= to_merge['connections'][opp_msg["IMEI"]]['z'];
+            for (var imei in to_merge['connections']) {
+              to_merge['connections'][imei]['x'] += dx;
+              to_merge['connections'][imei]['y'] += dy;
+              to_merge['connections'][imei]['z'] += dz;
+              configuration['devices'][device_index_a]['connections'][imei] = to_merge['connections'][imei];
+            }
+            configuration['devices'][device_index_a]['connections'][opp_msg["IMEI"]][opp_msg["side"][0]] = side_msg["IMEI"];
+
+            // update the connections
+            update_device(device_index_a);
+            configuration['devices'].splice(device_index_b, 1);
+          }
+        } else {
+          for (var i = 0; i < configuration['devices'].length; i++) {
+            if (side_msg["IMEI"] in configuration['devices'][i]['connections'] &&
+                opp_msg["IMEI"] in configuration['devices'][i]['connections']) {
+              configuration['devices'][i]['connections'][side_msg["IMEI"]][side_msg["side"][0]] = null;
+              configuration['devices'][i]['connections'][opp_msg["IMEI"]][opp_msg["side"][0]] = null;
+              update_device(i);
+              break;
+            }
+          }
+        }
+      }
+      // ignore bottom for now
+    }
   }
 
   print_configuration();
 }
 
 function send_configuration_qt() {
+  console.log(side_msgs);
   update_configuration(true,null);
   if (qt_client != null) {
     qt_client.write("conf:"+configuration);
@@ -203,7 +303,7 @@ function handle_side(message) {
     clearTimeout(buffer_qt);
   }
   side_msgs.push(message);
-  buffer_qt = setTimeout(send_configuration_qt, 100);
+  buffer_qt = setTimeout(send_configuration_qt, 5000);
 }
 
 io.on('connection', function(socket){
