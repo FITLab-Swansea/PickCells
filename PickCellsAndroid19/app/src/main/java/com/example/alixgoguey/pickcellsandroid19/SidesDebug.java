@@ -220,13 +220,16 @@ public class SidesDebug extends Activity implements View.OnClickListener{
         socket.emit("sideChange", obj);
     }
 
-    private void changeSide(int side){
+    private void changeSide(int side, View v){
         if (activeSides[side]){
             activeSides[side] = false;
+            v.setBackgroundColor(Color.RED);
             sendSide(side);
         } else {
             activeSides[side] = true;
+            v.setBackgroundColor(Color.GREEN);
             sendSide(side);
+
         }
     }
 
@@ -234,19 +237,19 @@ public class SidesDebug extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()){
             case (R.id.btn_north) :
-                changeSide(0);
+                changeSide(0, v);
                 break;
             case (R.id.btn_east) :
-                changeSide(1);
+                changeSide(1, v);
                 break;
             case (R.id.btn_south) :
-                changeSide(2);
+                changeSide(2, v);
                 break;
             case (R.id.btn_west) :
-                changeSide(3);
+                changeSide(3, v);
                 break;
             case (R.id.btn_bottom) :
-                changeSide(4);
+                changeSide(4, v);
                 break;
 
         }

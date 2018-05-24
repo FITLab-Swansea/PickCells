@@ -164,8 +164,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                                 try {
                                     activeSides[Integer.parseInt(side)] = Integer.parseInt(attachDirection);
                                     newCubeAdd(Integer.parseInt(side));
-                                } catch () {
-                                    
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
                                 }
 
 
