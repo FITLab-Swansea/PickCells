@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -37,6 +38,8 @@ public class DeviceList extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //Calling widgets
         btnPaired = (Button)findViewById(R.id.button);

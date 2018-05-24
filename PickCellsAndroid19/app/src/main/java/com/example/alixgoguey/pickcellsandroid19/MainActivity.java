@@ -202,9 +202,10 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
         try {
 
-            socket = IO.socket("http://172.20.10.2:9000");
+            // socket = IO.socket("http://172.20.10.2:9000");
             // socket = IO.socket("http://192.168.43.74:9000");
             // socket = IO.socket("http://192.168.0.26:9000");
+            socket = IO.socket("http://192.168.1.100:9000");
 
         } catch (URISyntaxException e) {
             e.printStackTrace();

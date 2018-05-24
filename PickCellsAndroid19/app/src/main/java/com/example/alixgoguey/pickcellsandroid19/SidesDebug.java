@@ -8,16 +8,21 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,16 +36,18 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 public class SidesDebug extends Activity implements View.OnClickListener{
-    Button btnNorth, btnSouth, btnEast, btnWest, btnBottom;
+    Button btnNorth, btnSouth, btnEast, btnWest, btnBottom, btnTop;
 
     Socket socket;
     String IMEI = null;
     byte obj_byt[];
     String obj_str;
 
-    boolean[] activeSides = new boolean[5];
+    boolean[] activeSides = new boolean[6];
 
     TextView cubeIDLable;
+
+    ConstraintLayout layout;
 
     @SuppressLint("MissingPermission")
     public String getDeviceIMEI() {
@@ -62,15 +69,19 @@ public class SidesDebug extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sides_debug);
         setButtons();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         cubeIDLable = (TextView) findViewById(R.id.cube_id);
+
+        layout = (ConstraintLayout) findViewById(R.id.bug_layout);
 
         try {
 
 //            socket = IO.socket("http://172.20.10.2:9000");
-            socket = IO.socket("http://172.20.10.11:9000");
+//            socket = IO.socket("http://172.20.10.11:9000");
             // socket = IO.socket("http://192.168.43.74:9000");
             // socket = IO.socket("http://192.168.0.26:9000");
+            socket = IO.socket("http://192.168.1.100:9000");
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -154,7 +165,7 @@ public class SidesDebug extends Activity implements View.OnClickListener{
                         }
 
                         BitmapDrawable ob = new BitmapDrawable(getResources(), bmp);
-                        // layout.setBackground(ob);
+                        layout.setBackground(ob);
                     }
                 });
             }
@@ -167,11 +178,20 @@ public class SidesDebug extends Activity implements View.OnClickListener{
                     public void run() {
 
                         cubeIDLable.setText("Disconnected...");
+                        endActivity();
+
                     }
                 });
             }
         });
         socket.connect();
+    }
+
+    private void endActivity(){
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Disconnected...", Toast.LENGTH_SHORT);
+        toast.show();
+        finish();
     }
 
     private void setButtons() {
@@ -180,13 +200,14 @@ public class SidesDebug extends Activity implements View.OnClickListener{
         btnSouth = findViewById(R.id.btn_south);
         btnEast = findViewById(R.id.btn_east);
         btnWest = findViewById(R.id.btn_west);
+        btnTop = findViewById(R.id.btn_top);
 
         btnBottom.setOnClickListener(this);
         btnNorth.setOnClickListener(this);
         btnSouth.setOnClickListener(this);
         btnEast.setOnClickListener(this);
         btnWest.setOnClickListener(this);
-        btnBottom.setOnClickListener(this);
+        btnTop.setOnClickListener(this);
     }
 
     private String indexToChar(int index){
@@ -201,6 +222,8 @@ public class SidesDebug extends Activity implements View.OnClickListener{
                 return "West";
             case 4:
                 return "Bottom";
+            case 5:
+                return "Top";
         }
         return "";
     }
@@ -250,6 +273,9 @@ public class SidesDebug extends Activity implements View.OnClickListener{
                 break;
             case (R.id.btn_bottom) :
                 changeSide(4, v);
+                break;
+            case (R.id.btn_top) :
+                changeSide(5, v);
                 break;
 
         }
