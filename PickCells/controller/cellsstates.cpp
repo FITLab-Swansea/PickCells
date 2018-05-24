@@ -186,13 +186,15 @@ void CellsStates::updateStates() {
                             break;
                         }
                     }
-                    as = new AppScreen();
-                    as->initialize();
-                    as->setRect(x_offset+col,row,1,1);
-                    as->setTopLeft(_nb_devices-1,screen_layer,row,col);
-                    as->setDepth(cur_depth); cur_depth++;
-                    as->setHasContent(top_layer != -1);
-                    _app_screens->append(as);
+                    if (top_layer != 1) {
+                        as = new AppScreen();
+                        as->initialize();
+                        as->setRect(x_offset+col,row,1,1);
+                        as->setTopLeft(_nb_devices-1,screen_layer,row,col);
+                        as->setDepth(cur_depth); cur_depth++;
+                        as->setHasContent(top_layer != -1);
+                        _app_screens->append(as);
+                    }
                 }
             }
             x_offset += device_w + 1;
