@@ -32,7 +32,10 @@ public:
 
     void setDebug(bool val);
 
+    void sendNewVisual();
+
 signals:
+    void visualUpdate(QString,QPixmap*);
 
 public slots:
 

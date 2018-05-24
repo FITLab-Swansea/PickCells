@@ -77,6 +77,8 @@ void CellsStates::updateStates() {
                 Cell *c = new Cell();
                 c->initialize(watch_id);
                 _currrent_cells.append(c);
+
+                connect(c,SIGNAL(visualUpdate(QString,QPixmap*)),this,SLOT(relayVisualUpdate(QString,QPixmap*)));
             }
         }
         for (int l = 0; l < _available_cells.size(); l++) {
@@ -449,6 +451,10 @@ void CellsStates::setDebug(bool val) {
 void CellsStates::setDebugConf(int ind) {
     _debug_conf = ind;
     updateStates();
+}
+
+void CellsStates::relayVisualUpdate(QString str, QPixmap * pix) {
+    emit visualUpdate(str, pix);
 }
 
 void CellsStates::resetCurrentStates() {

@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(states, SIGNAL(new_configuration(QString)), ui->app_view, SLOT(handle_new_configuration(QString)));
     connect(states, SIGNAL(new_configuration(QString)), ui->cells_view, SLOT(handle_new_configuration(QString)));
+    connect(states, SIGNAL(visualUpdate(QString,QPixmap*)), this, SLOT(handleVisualUpdate(QString,QPixmap*)));
 
 
     socket = new QTcpSocket(this);
@@ -43,22 +44,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         }
     } else if (event->key() == Qt::Key_S) {
         if (socket->isOpen()) {
-            QPixmap pix(":/imgs/settings.png");
-            pix = pix.scaled(128,128);
-            QImage img = pix.toImage();
-            QByteArray data(128*128*3 + 2,'\0');
-            data[0] = (unsigned int) 128;
-            data[1] = (unsigned int) 128;
-            int k = 2;
-            for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
-                for (int pix_y = 0; pix_y < pix.height(); pix_y++) {
-                    QRgb pixel = pix.toImage().pixel(pix_x,pix_y);
-                    data[k] = (unsigned int) ((pixel >> 16) & 0xff); k++;
-                    data[k] = (unsigned int) ((pixel >> 8) & 0xff); k++;
-                    data[k] = (unsigned int) (pixel & 0xff); k++;
-                }
-            }
-            socket->write(data);
+//            QPixmap pix(":/imgs/settings.png");
+//            pix = pix.scaled(128,128);
+//            QByteArray data(128*128*3 + 2,'\0');
+//            data[0] = (unsigned int) 128;
+//            data[1] = (unsigned int) 128;
+//            int k = 2;
+//            for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
+//                for (int pix_y = 0; pix_y < pix.height(); pix_y++) {
+//                    QRgb pixel = pix.toImage().pixel(pix_x,pix_y);
+//                    data[k] = (unsigned int) ((pixel >> 16) & 0xff); k++;
+//                    data[k] = (unsigned int) ((pixel >> 8) & 0xff); k++;
+//                    data[k] = (unsigned int) (pixel & 0xff); k++;
+//                }
+//            }
+//            socket->write(data);
         }
     }
 }
@@ -109,5 +109,36 @@ void MainWindow::readyRead() {
             states->setJsonStates(jsonObject);
             states->updateStates();
         }
+    }
+}
+
+void MainWindow::handleVisualUpdate(QString str, QPixmap * pix_ptr) {
+    if (socket->isOpen()) {
+        QPixmap pix = pix_ptr->scaled(128,128);
+        int size_id = str.length() + 3 + 2;
+        // "img:charoftheid:whrgbrgbrgb...
+        QByteArray data(128*128*3 + 2 + size_id,'\0');
+
+        data[0] = 'i';
+        data[1] = 'm';
+        data[2] = 'g';
+        data[3] = ':';
+        for (int k = 0; k < str.length(); k++) {
+            data[4+k] = str.toStdString().c_str()[k];
+        }
+        data[size_id-1] = ':';
+
+        data[size_id+0] = (unsigned int) 128;
+        data[size_id+1] = (unsigned int) 128;
+        int k = 2;
+        for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
+            for (int pix_y = 0; pix_y < pix.height(); pix_y++) {
+                QRgb pixel = pix.toImage().pixel(pix_x,pix_y);
+                data[size_id+k] = (unsigned int) ((pixel >> 16) & 0xff); k++;
+                data[size_id+k] = (unsigned int) ((pixel >> 8) & 0xff); k++;
+                data[size_id+k] = (unsigned int) (pixel & 0xff); k++;
+            }
+        }
+        socket->write(data);
     }
 }

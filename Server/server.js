@@ -16,6 +16,7 @@ http.listen(port);
 datelog('Server listening on port '+port+'.')
 
 var list_watch_client = {};
+var list_imei_client = {};
 var qt_client = null;
 
 var buffer_qt = null;
@@ -328,7 +329,7 @@ io.on('connection', function(socket){
   socket.on('connected', function(data) {
       datelog("Client ("+data["IMEI"]+") says: "+data["Hi"]);
       list_watch_client[socket.id]['IMEI'] = data["IMEI"];
-      list_watch_client[data["IMEI"]] = {'socket': socket.id };
+      list_imei_client[data["IMEI"]] = {'socket': socket };
 
       update_configuration(true,data["IMEI"]);
       send_configuration_qt();
@@ -359,7 +360,7 @@ io.on('connection', function(socket){
       update_configuration(false,list_watch_client[socket.id]['IMEI']);
       send_configuration_qt();
 
-      delete list_watch_client[list_watch_client[socket.id]['IMEI']];
+      delete list_imei_client[list_watch_client[socket.id]['IMEI']];
       delete list_watch_client[socket.id];
   });
 });
@@ -382,17 +383,31 @@ function onClientConnected(socket) {
   send_configuration_qt();
 
   socket.on('data', (data) => { 
-    //var msg = data.toString().replace(/[\n\r]*$/, '');
+    // var msg = data.toString().replace(/[\n\r]*$/, '');
     // var msg = data.toString();
     // datelog(clientName + ' said: ' + msg);
     // datelog(clientName + ' said: something');
 
     // notifing the client
     // socket.write('We got your message (' + msg + '). Thanks!\n');
-    socket.write('We got your message. Thanks!\n');
 
-    for (var key in list_watch_client) {
-        list_watch_client[key].emit('qt', {"msg": data});
+    // socket.write('We got your message. Thanks!\n');
+
+    // for (var key in list_imei_client) {
+    //     list_imei_client[key]['socket'].emit('qt', {"msg": data});
+    // }
+
+    if (data.length > 3) {
+      var msg = data.toString();
+      var info = msg.split(':');
+      if (info[0] == "img") {
+        var imei = parseInt(info[1]);
+        if (imei in list_imei_client) {
+          // console.log(imei);
+          var sub_buf = data.slice(info[0].length+info[1].length+2,data.length);
+          list_imei_client[imei]['socket'].emit('qt', {"msg": sub_buf});
+        }
+      }
     }
   });
   

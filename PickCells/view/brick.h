@@ -27,6 +27,7 @@ public:
     void setSeen(bool val) { _is_seen = val; }
 
     void setPixmap(QPixmap val) { _pixmap = val; }
+    QPixmap* getPixmap() { return &_pixmap; }
 
 private:
     int _brick_size;

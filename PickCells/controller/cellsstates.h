@@ -50,8 +50,10 @@ public:
 
 signals:
     void new_configuration(QString);
+    void visualUpdate(QString,QPixmap*);
 
 public slots:
+    void relayVisualUpdate(QString str, QPixmap*pix);
 
 private:
     static CellsStates *_cs;

@@ -76,6 +76,7 @@ void CellsView::updateStates() {
                             c->avatar()->initialize(brick_size, layer_off);
                             c->avatar()->setPos(x_device_off + brick_size*col + layer_off*(states->getDeviceDepth(device)-1 - layer),
                                                 y_device_off + brick_size*row + layer_off*(states->getDeviceDepth(device)-1 - layer));
+                            c->sendNewVisual();
                         }
                     }
                 }
@@ -117,6 +118,7 @@ void CellsView::setImage(QString file_path) {
                 }
                 if (c != NULL) {
                     c->setPixmap(image.copy(col*w_tile, row*h_tile, w_tile, h_tile));
+                    c->sendNewVisual();
                 }
             }
         }

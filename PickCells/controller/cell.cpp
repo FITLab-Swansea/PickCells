@@ -44,4 +44,9 @@ void Cell::setAvatarPixmap(QPixmap val) {
 void Cell::setDebug(bool val) {
     _debug = val;
     setPixmap(_pixmap);
+    emit visualUpdate(_cell_id,_avatar->getPixmap());
+}
+
+void Cell::sendNewVisual() {
+    emit visualUpdate(_cell_id,_avatar->getPixmap());
 }

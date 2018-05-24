@@ -43,6 +43,8 @@ public slots:
     void bytesWritten(qint64 bytes);
     void readyRead();
 
+    void handleVisualUpdate(QString str, QPixmap * pix_ptr);
+
 private:
     Ui::MainWindow *ui;
 

@@ -230,6 +230,7 @@ void AppsView::updateCells(QRectF visual_change, bool persistent) {
                                 _to_restore.append(c);
                             }
                             c->avatar()->update();
+//                            c->sendNewVisual();
                         }
                     }
                 }
