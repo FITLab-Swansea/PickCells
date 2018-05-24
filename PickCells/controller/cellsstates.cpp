@@ -30,6 +30,8 @@ void CellsStates::initialize() {
 //        _available_cells.append(c);
 //    }
 
+    _bricks_to_delete.clear();
+
     _cell_states = NULL;
     _last_app_screens = NULL;
     _app_screens = NULL;
@@ -60,7 +62,7 @@ void CellsStates::updateStates() {
         QJsonArray watches = json_states["watches"].toArray();
         QList<Cell*> _currrent_cells;
         for (int k = 0; k < watches.size(); k ++) {
-            int watch_id = watches[k].toInt();
+            QString watch_id = watches[k].toString();
             qDebug() << "  -> watch " << k << " " << watch_id;
 
             bool available = false;
@@ -79,6 +81,7 @@ void CellsStates::updateStates() {
         }
         for (int l = 0; l < _available_cells.size(); l++) {
             if (_available_cells[l] != NULL) {
+                _bricks_to_delete.append(_available_cells[l]->avatar());
                 delete _available_cells[l];
             }
         }
@@ -137,7 +140,7 @@ void CellsStates::updateStates() {
             connections.keys().size();
             foreach(const QString& key, connections.keys()) {
                 QJsonObject con = connections[key].toObject();
-                qDebug() << "          -> " << key.toInt();
+                qDebug() << "          -> " << key;
                 qDebug() << "             " << con;
 
                 int x = con["x"].toInt() - start_x;
@@ -145,7 +148,7 @@ void CellsStates::updateStates() {
                 int z = con["z"].toInt() - start_z;
 
                 for (int l = 0; l < _available_cells.size(); l++) {
-                    if (_available_cells[l]->getCellId() == key.toInt()) {
+                    if (_available_cells[l]->getCellId() == key) {
                         _available_cells[l]->setSeen(false);
                         (*_cell_states)[k][z][y][x] = _available_cells[l];
                     }

@@ -197,6 +197,10 @@ function update_configuration(connection,watch) {
         opposite = "West";
       } else if (opposite == "West") {
         opposite = "East";
+      } else if (opposite == "Top") {
+        opposite = "Bottom";
+      } else if (opposite == "Bottom") {
+        opposite = "Top";
       }
 
       var opp_msg = null;
@@ -254,6 +258,14 @@ function update_configuration(connection,watch) {
               dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x']+1;
               dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y'];
               dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z'];
+            } else if (side_msg["side"][0] == 'T') {
+              dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x'];
+              dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y'];
+              dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z']+1;
+            } else if (side_msg["side"][0] == 'B') {
+              dx = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['x'];
+              dy = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['y'];
+              dz = configuration['devices'][device_index_a]['connections'][side_msg["IMEI"]]['z']-1;
             }
             dx -= to_merge['connections'][opp_msg["IMEI"]]['x'];
             dy -= to_merge['connections'][opp_msg["IMEI"]]['y'];
@@ -319,6 +331,7 @@ io.on('connection', function(socket){
       list_watch_client[data["IMEI"]] = {'socket': socket.id };
 
       update_configuration(true,data["IMEI"]);
+      send_configuration_qt();
   });
 
   socket.on('clicked', function(data) {
@@ -344,6 +357,7 @@ io.on('connection', function(socket){
       datelog("Client disconnected");
 
       update_configuration(false,list_watch_client[socket.id]['IMEI']);
+      send_configuration_qt();
 
       delete list_watch_client[list_watch_client[socket.id]['IMEI']];
       delete list_watch_client[socket.id];

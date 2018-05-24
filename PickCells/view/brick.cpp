@@ -1,7 +1,13 @@
 #include "brick.h"
 
-Brick::Brick(QGraphicsItem *parent, int brick_size, int iso_view)
+Brick::Brick(QGraphicsItem *parent)
     : QGraphicsItem(parent) {
+}
+
+Brick::~Brick() {
+}
+
+void Brick::initialize(int brick_size, int iso_view) {
     _brick_size = brick_size;
     _iso_view = iso_view;
 
@@ -28,9 +34,6 @@ Brick::Brick(QGraphicsItem *parent, int brick_size, int iso_view)
 
     _pixmap = QPixmap(100,100);
     _pixmap.fill(QColor("#2277FF"));
-}
-
-Brick::~Brick() {
 }
 
 QRectF Brick::boundingRect() const {

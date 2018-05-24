@@ -15,8 +15,10 @@ class Brick : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    Brick(QGraphicsItem * parent = 0, int brick_size = 20, int iso_view = 5);
+    Brick(QGraphicsItem * parent = 0);
     ~Brick();
+
+    void initialize(int brick_size = 20, int iso_view = 5);
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 

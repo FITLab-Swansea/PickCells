@@ -15,9 +15,9 @@ class Cell : public QObject
     Q_OBJECT
 public:
     explicit Cell(QObject *parent = nullptr);
-    void initialize(int id);
+    void initialize(QString id);
 
-    int getCellId() { return _cell_id; }
+    QString getCellId() { return _cell_id; }
 
     bool getSeen() { return _seen; }
     void setSeen(bool val) { _seen = val; }
@@ -37,7 +37,7 @@ signals:
 public slots:
 
 private:
-    int _cell_id;
+    QString _cell_id;
 
     bool _seen;
     QPixmap _pixmap;

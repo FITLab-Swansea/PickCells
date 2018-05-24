@@ -19,6 +19,14 @@ void CellsView::resizeEvent(QResizeEvent* e) {
 void CellsView::updateStates() {
     CellsStates *states = CellsStates::getInstance();
 
+    for (int k = 0; k < states->_bricks_to_delete.size(); k++) {
+        if (states->_bricks_to_delete[k] != NULL) {
+            _scene->removeItem(states->_bricks_to_delete[k]);
+            delete states->_bricks_to_delete[k];
+        }
+    }
+    states->_bricks_to_delete.clear();
+
     for (int device = 0; device < states->getNbDevices(); device++ ) {
         for (int layer = 0; layer < states->getDeviceDepth(device); layer++) {
             for (int row = 0; row < states->getDeviceHeight(device); row++) {
@@ -60,11 +68,12 @@ void CellsView::updateStates() {
                         Cell *c = states->getCell(device, layer, row, col);
                         if (c != NULL) {
                             if (c->avatar() == NULL) {
-                                c->setAvatar(new Brick(NULL, brick_size, layer_off));
+                                c->setAvatar(new Brick(NULL));
                                 c->avatar()->setSeen(c->getSeen());
                                 c->setAvatarPixmap(c->getPixmap());
                                 _scene->addItem(c->avatar());
                             }
+                            c->avatar()->initialize(brick_size, layer_off);
                             c->avatar()->setPos(x_device_off + brick_size*col + layer_off*(states->getDeviceDepth(device)-1 - layer),
                                                 y_device_off + brick_size*row + layer_off*(states->getDeviceDepth(device)-1 - layer));
                         }

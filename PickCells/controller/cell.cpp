@@ -4,7 +4,7 @@ Cell::Cell(QObject *parent) : QObject(parent) {
 
 }
 
-void Cell::initialize(int id) {
+void Cell::initialize(QString id) {
     _cell_id = id;
     _seen = false;
 
@@ -18,7 +18,7 @@ void Cell::initialize(int id) {
     QPainter painter(&_pixmap_debug);
     painter.setFont(QFont("Verdana", 30, QFont::Bold));
     painter.setPen(QColor("#AA000000"));
-    painter.drawText(QPoint(30,60),QString::number(_cell_id));
+    painter.drawText(QPoint(30,60),_cell_id);
 
     _debug = false;
 }

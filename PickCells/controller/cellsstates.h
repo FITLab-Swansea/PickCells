@@ -46,6 +46,8 @@ public:
     void setDebug(bool val);
     void setDebugConf(int ind);
 
+    QList<Brick*> _bricks_to_delete;
+
 signals:
     void new_configuration(QString);
 
