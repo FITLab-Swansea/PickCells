@@ -38,7 +38,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
         qDebug() << "Connecting,..";
         socket->connectToHost("localhost", 9001);
-        if(!socket->waitForDisconnected(1000)) {
+        if(!socket->waitForConnected(1000)) {
             qDebug() << "Error: " << socket->errorString();
         }
     } else if (event->key() == Qt::Key_S) {
@@ -96,5 +96,18 @@ void MainWindow::bytesWritten(qint64 bytes) {
 
 void MainWindow::readyRead() {
     qDebug() << "Reading...";
-    qDebug() << socket->readAll();
+    QByteArray msg = socket->readAll();
+    qDebug() << msg;
+
+    if (msg.length()>5) {
+        if (msg.left(5) == "conf:") {
+            msg = msg.right(msg.length()-5);
+
+            QJsonDocument jsonResponse = QJsonDocument::fromJson(QString(msg).toUtf8());
+            QJsonObject jsonObject = jsonResponse.object();
+            CellsStates *states = CellsStates::getInstance();
+            states->setJsonStates(jsonObject);
+            states->updateStates();
+        }
+    }
 }

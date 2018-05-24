@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QList>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 #include "cell.h"
 #include "appscreen.h"
 
@@ -26,6 +30,7 @@ public:
     static CellsStates* getInstance();
     void initialize();
 
+    void setJsonStates(QJsonObject jsonObject) { json_set = true; json_states = jsonObject; }
     void updateStates();
 
     int getNbDevices() { return _nb_devices; }
@@ -66,6 +71,9 @@ private:
 
     QList<AppScreen*> *_last_app_screens;
     QList<AppScreen*> *_app_screens;
+
+    bool json_set;
+    QJsonObject json_states;
 };
 
 #endif // CELLSSTATES_H

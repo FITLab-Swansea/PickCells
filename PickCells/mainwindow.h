@@ -8,6 +8,11 @@
 #include <QAbstractSocket>
 #include <QRgb>
 
+#include <QByteArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 #include "controller/cellsstates.h"
 
 #include <QDebug>
