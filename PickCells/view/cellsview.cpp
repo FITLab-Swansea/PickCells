@@ -76,7 +76,6 @@ void CellsView::updateStates() {
                             c->avatar()->initialize(brick_size, layer_off);
                             c->avatar()->setPos(x_device_off + brick_size*col + layer_off*(states->getDeviceDepth(device)-1 - layer),
                                                 y_device_off + brick_size*row + layer_off*(states->getDeviceDepth(device)-1 - layer));
-                            c->sendNewVisual();
                         }
                     }
                 }
@@ -84,6 +83,8 @@ void CellsView::updateStates() {
             x_device_off += btw_off + brick_size*states->getDeviceWidth(device) + states->getDeviceDepth(device)*layer_off;
         }
     }
+
+    _scene->update();
 }
 
 void CellsView::setImage(QString file_path) {
@@ -99,6 +100,7 @@ void CellsView::setImage(QString file_path) {
         }
     }
 
+    QList<Cell*> to_update;
     if (id_largest_device > -1) {
         int device = id_largest_device;
 
@@ -118,11 +120,15 @@ void CellsView::setImage(QString file_path) {
                 }
                 if (c != NULL) {
                     c->setPixmap(image.copy(col*w_tile, row*h_tile, w_tile, h_tile));
-                    c->sendNewVisual();
+                    to_update.append(c);
                 }
             }
         }
         _scene->update();
+    }
+
+    for (int k = 0; k < to_update.size(); k++) {
+        to_update[k]->sendNewVisual();
     }
 }
 

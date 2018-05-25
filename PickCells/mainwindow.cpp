@@ -115,10 +115,12 @@ void MainWindow::readyRead() {
 
 void MainWindow::handleVisualUpdate(QString str, QPixmap * pix_ptr) {
     if (socket->isOpen()) {
-        QPixmap pix = pix_ptr->scaled(128,128);
+        int require_w = 64;//128;
+        int require_h = 64;//128;
+        QPixmap pix = pix_ptr->scaled(require_w,require_h);
         int size_id = str.length() + 3 + 2;
         // "img:charoftheid:whrgbrgbrgb...
-        QByteArray data(128*128*3 + 2 + size_id + 1,'\n');
+        QByteArray data(require_w*require_h*3 + 2 + size_id + 1,'\n');
 
         data[0] = 'i';
         data[1] = 'm';
@@ -129,8 +131,8 @@ void MainWindow::handleVisualUpdate(QString str, QPixmap * pix_ptr) {
         }
         data[size_id-1] = ':';
 
-        data[size_id+0] = (unsigned int) 128;
-        data[size_id+1] = (unsigned int) 128;
+        data[size_id+0] = (unsigned int) require_w;
+        data[size_id+1] = (unsigned int) require_h;
         int k = 2;
         for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
             for (int pix_y = 0; pix_y < pix.height(); pix_y++) {

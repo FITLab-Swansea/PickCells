@@ -190,12 +190,14 @@ void AppsView::updateMouseEvent(QMouseEvent *event, bool release) {
     if (_mouse_ptr->isVisible()) {
         _mouse_ptr->setPos(event->x(), event->y());
 
-        QRectF bbox_ptr = _mouse_ptr->rect();
-        bbox_ptr.setRect(bbox_ptr.x()+event->x(),
-                         bbox_ptr.y()+event->y(),
-                         bbox_ptr.width(),
-                         bbox_ptr.height());
-        updateCells(bbox_ptr,false);
+        if (CellsStates::getInstance()->getDebug()) {
+            QRectF bbox_ptr = _mouse_ptr->rect();
+            bbox_ptr.setRect(bbox_ptr.x()+event->x(),
+                             bbox_ptr.y()+event->y(),
+                             bbox_ptr.width(),
+                             bbox_ptr.height());
+            updateCells(bbox_ptr,false);
+        }
     }
 }
 
@@ -203,6 +205,7 @@ void AppsView::updateCells(QRectF visual_change, bool persistent) {
     CellsStates *states = CellsStates::getInstance();
     QList<AppScreen*>* as = states->getAppSreens();
 
+    QList<Cell*> to_update;
     for (int k = as->size()-1; k >= 0; k--) {
         AppScreen *s = (*as)[k];
         QRectF bbox_avt = s->avatar->rect();
@@ -230,7 +233,7 @@ void AppsView::updateCells(QRectF visual_change, bool persistent) {
                                 _to_restore.append(c);
                             }
                             c->avatar()->update();
-//                            c->sendNewVisual();
+                            to_update.append(c);
                         }
                     }
                 }
@@ -238,12 +241,17 @@ void AppsView::updateCells(QRectF visual_change, bool persistent) {
         }
     }
     _scene->update();
+
+    for (int k = 0; k < to_update.size(); k++) {
+        to_update[k]->sendNewVisual();
+    }
 }
 
 void AppsView::resetCells() {
     for (int k = 0; k < _to_restore.size(); k++) {
         _to_restore[k]->setAvatarPixmap(_to_restore[k]->getPixmap());
         _to_restore[k]->avatar()->update();
+        _to_restore[k]->sendNewVisual();
     }
     _to_restore.clear();
 }

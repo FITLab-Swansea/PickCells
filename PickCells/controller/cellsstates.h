@@ -44,6 +44,7 @@ public:
     QList<AppScreen*>* getAppSreens() { return _app_screens; }
 
     void setDebug(bool val);
+    bool getDebug() { return _debug; }
     void setDebugConf(int ind);
 
     QList<Brick*> _bricks_to_delete;

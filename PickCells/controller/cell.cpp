@@ -19,12 +19,12 @@ void Cell::initialize(QString id) {
 //    painter.setFont(QFont("Verdana", 20, QFont::Bold));
     QFont font = painter.font();
     font.setFamily("Verdana");
-    font.setPixelSize(10);
+    font.setPixelSize(20);
     painter.setFont(font);
     painter.setPen(QColor("#AA000000"));
 //    painter.drawText(QPoint(30,60),_cell_id);
-    const QRect rectangle = QRect(0, 50, 200, 200);
-    painter.drawText(rectangle, 0, _cell_id);
+    const QRect rectangle = QRect(30, 30, 200, 200);
+    painter.drawText(rectangle, 0, _cell_id.right(3));
 
 
     _debug = false;
@@ -55,5 +55,6 @@ void Cell::setDebug(bool val) {
 }
 
 void Cell::sendNewVisual() {
+    qDebug() << "updating cell " << _cell_id;
     emit visualUpdate(_cell_id,_avatar->getPixmap());
 }

@@ -306,7 +306,7 @@ function send_configuration_qt() {
   console.log(side_msgs);
   update_configuration(true,null);
   if (qt_client != null) {
-    qt_client.write("conf:"+JSON.stringify(configuration));
+    qt_client.write("conf:"+JSON.stringify(configuration,'utf8'));
   }
   buffer_qt = null;
 }
@@ -375,22 +375,22 @@ let server = net.createServer(onClientConnected);
 server.listen(PORT, ADDRESS);
 
 function parse_buffer(data) {
-    datelog("Data from Qt App received ("+data.length+" bytes)");
-    if (data.length > 3) {
-      var index = data.indexOf(':',0,'utf8');
-      if (index < data.length) {
-        var tag = data.slice(0,index).toString('utf8');
+    datelog("Data from Qt App received ("+Buffer(data).length+" bytes)");
+    if (Buffer(data).length > 3) {
+      var index = Buffer(data).indexOf(':',0,'utf8');
+      if ((index >= 0) && (index < Buffer(data).length)) {
+        var tag = Buffer(data).slice(0,index).toString('utf8');
         datelog("   -> tag "+tag);
         if (tag == "img") {
-          data = data.slice(index+1,data.length);
-          index = data.indexOf(':',0,'utf8');
-          if (index < data.length-1) {
-            var imei = data.slice(0,index).toString('utf8');
+          data = Buffer(data).slice(index+1,Buffer(data).length);
+          index = Buffer(data).indexOf(':',0,'utf8');
+          if ((index >= 0) && (index < Buffer(data).length-1)) {
+            var imei = Buffer(data).slice(0,index).toString('utf8');
             datelog("   -> img received, on instance to be send to "+imei);
             if (imei in list_imei_client) {
-              var msg = data.slice(index+1,data.length);
+              var msg = Buffer(data).slice(index+1,Buffer(data).length);
               datelog("   -> img sent to "+imei+" ("+msg.length+" bytes)");
-              list_imei_client[imei]['socket'].emit('qt', {"msg": JSON.stringify(msg)});
+              list_imei_client[imei]['socket'].emit('qt', {"msg": JSON.stringify(msg,'utf8')});
             }
           }
         }
@@ -408,26 +408,30 @@ function onClientConnected(socket) {
   send_configuration_qt();
 
   socket.on('data', (data) => {
-    datelog("Original data received ("+data.length+" bytes)");
-    if (prev_buf != null) {
-      data = prev_buf + data;
-    }
-    datelog("Buffer adjustment ("+data.length+" bytes)");
-    var index = data.indexOf('\n',0,'utf8');
-    if (index < data.length) {
-      parse_buffer(data.slice(0,index));
-      if (index == data.length-1) {
-        prev_buf = null;
-        datelog("Buffer reset");
-      } else {
-        prev_buf = data.slice(index+1,data.length);
-        datelog("Buffer trimmed ("+prev_buf.length+" bytes)");
+    var new_data = true;
+    while (new_data) {
+      new_data = false;
+      datelog("Original data received ("+Buffer(data).length+" bytes)");
+      if (prev_buf != null) {
+        data = Buffer.concat([prev_buf, data]);
       }
-    } else {
-      prev_buf = data;
-      datelog("Buffer carried ("+prev_buf.length+" bytes)");
+      datelog("Buffer adjustment ("+data.length+" bytes)");
+      var index = Buffer(data).indexOf('\n',0,'utf8');
+      if ((index >= 0) && (index < Buffer(data).length)) {
+        parse_buffer(Buffer(data).slice(0,index));
+        prev_buf = null;
+        if (index == Buffer(data).length-1) {
+          datelog("Buffer reset");
+        } else {
+          data = Buffer(data).slice(index+1,Buffer(data).length);
+          datelog("Buffer trimmed ("+Buffer(data).length+" bytes)");
+          new_data = true;
+        }
+      } else {
+        prev_buf = data;
+        datelog("Buffer carried ("+prev_buf.length+" bytes)");
+      }
     }
-
   });
   
   socket.on('end', () => {
