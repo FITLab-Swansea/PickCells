@@ -16,9 +16,16 @@ void Cell::initialize(QString id) {
     _pixmap_debug = QPixmap(200,200);
     _pixmap_debug.fill(QColor("#00FFFFFF"));
     QPainter painter(&_pixmap_debug);
-    painter.setFont(QFont("Verdana", 30, QFont::Bold));
+//    painter.setFont(QFont("Verdana", 20, QFont::Bold));
+    QFont font = painter.font();
+    font.setFamily("Verdana");
+    font.setPixelSize(10);
+    painter.setFont(font);
     painter.setPen(QColor("#AA000000"));
-    painter.drawText(QPoint(30,60),_cell_id);
+//    painter.drawText(QPoint(30,60),_cell_id);
+    const QRect rectangle = QRect(0, 50, 200, 200);
+    painter.drawText(rectangle, 0, _cell_id);
+
 
     _debug = false;
 }

@@ -374,6 +374,31 @@ const ADDRESS = 'localhost';
 let server = net.createServer(onClientConnected);
 server.listen(PORT, ADDRESS);
 
+function parse_buffer(data) {
+    datelog("Data from Qt App received ("+data.length+" bytes)");
+    if (data.length > 3) {
+      var index = data.indexOf(':',0,'utf8');
+      if (index < data.length) {
+        var tag = data.slice(0,index).toString('utf8');
+        datelog("   -> tag "+tag);
+        if (tag == "img") {
+          data = data.slice(index+1,data.length);
+          index = data.indexOf(':',0,'utf8');
+          if (index < data.length-1) {
+            var imei = data.slice(0,index).toString('utf8');
+            datelog("   -> img received, on instance to be send to "+imei);
+            if (imei in list_imei_client) {
+              var msg = data.slice(index+1,data.length);
+              datelog("   -> img sent to "+imei+" ("+msg.length+" bytes)");
+              list_imei_client[imei]['socket'].emit('qt', {"msg": JSON.stringify(msg)});
+            }
+          }
+        }
+      }
+    }
+}
+
+var prev_buf = null;
 function onClientConnected(socket) {
 
   var clientName = 'Qt Client'
@@ -382,33 +407,27 @@ function onClientConnected(socket) {
 
   send_configuration_qt();
 
-  socket.on('data', (data) => { 
-    // var msg = data.toString().replace(/[\n\r]*$/, '');
-    // var msg = data.toString();
-    // datelog(clientName + ' said: ' + msg);
-    // datelog(clientName + ' said: something');
-
-    // notifing the client
-    // socket.write('We got your message (' + msg + '). Thanks!\n');
-
-    // socket.write('We got your message. Thanks!\n');
-
-    // for (var key in list_imei_client) {
-    //     list_imei_client[key]['socket'].emit('qt', {"msg": data});
-    // }
-
-    if (data.length > 3) {
-      var msg = data.toString();
-      var info = msg.split(':');
-      if (info[0] == "img") {
-        var imei = parseInt(info[1]);
-        if (imei in list_imei_client) {
-          // console.log(imei);
-          var sub_buf = data.slice(info[0].length+info[1].length+2,data.length);
-          list_imei_client[imei]['socket'].emit('qt', {"msg": sub_buf});
-        }
-      }
+  socket.on('data', (data) => {
+    datelog("Original data received ("+data.length+" bytes)");
+    if (prev_buf != null) {
+      data = prev_buf + data;
     }
+    datelog("Buffer adjustment ("+data.length+" bytes)");
+    var index = data.indexOf('\n',0,'utf8');
+    if (index < data.length) {
+      parse_buffer(data.slice(0,index));
+      if (index == data.length-1) {
+        prev_buf = null;
+        datelog("Buffer reset");
+      } else {
+        prev_buf = data.slice(index+1,data.length);
+        datelog("Buffer trimmed ("+prev_buf.length+" bytes)");
+      }
+    } else {
+      prev_buf = data;
+      datelog("Buffer carried ("+prev_buf.length+" bytes)");
+    }
+
   });
   
   socket.on('end', () => {

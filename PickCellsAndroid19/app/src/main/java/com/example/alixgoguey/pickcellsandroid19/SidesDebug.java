@@ -9,27 +9,19 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
-import android.text.Layout;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -40,7 +32,7 @@ public class SidesDebug extends Activity implements View.OnClickListener{
 
     Socket socket;
     String IMEI = null;
-    byte obj_byt[];
+    JSONArray obj_buff;
     String obj_str;
 
     boolean[] activeSides = new boolean[6];
@@ -127,47 +119,61 @@ public class SidesDebug extends Activity implements View.OnClickListener{
 
             @Override
             public void call(Object... args) {
-                JSONObject obj = (JSONObject) args[0];
-                try {
-                    obj_byt = (byte[]) obj.get("msg");
-                } catch (JSONException e) {
-                    obj_byt = null;
-                }
+            JSONObject obj = (JSONObject) args[0];
+            obj_buff = null;
+            try {
+                obj = new JSONObject(obj.getString("msg"));
+                obj_buff = obj.getJSONArray("data");
+            } catch (JSONException e) {
+                Log.d("IOIO", "problem retrieving byte array");
+                obj_buff = null;
+            }
 
+            if (obj_buff != null) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        String s = "Hello World!";
-                        cubeIDLable.setText(s + "\n" + obj_byt.length);
+                    String s = "Hello World!";
+                    cubeIDLable.setText(s + "\n" + obj_buff.length());
 
-                        //Log.d("IOIO", String.valueOf(obj_byt.length));
+                    Log.d("IOIO", String.valueOf(obj_buff.length()));
 
-                        int w = (0x000000FF & ((int)obj_byt[0]));//Integer.parseInt(strs[0]);
-                        int h = (0x000000FF & ((int)obj_byt[1]));//Integer.parseInt(strs[1]);
-                        //Log.d("IOIO", "width = " + w);
-                        //Log.d("IOIO", "height = " + h);
+                    try {
+                        int w = (0x000000FF & ((int) obj_buff.get(0)));//Integer.parseInt(strs[0]);
+                        int h = (0x000000FF & ((int) obj_buff.get(1)));//Integer.parseInt(strs[1]);
+                        Log.d("IOIO", "width = " + w);
+                        Log.d("IOIO", "height = " + h);
 
-                        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-                        Bitmap bmp = Bitmap.createBitmap(w,h, conf);
-                        int k = 2;
-                        for (int pix_x = 0; pix_x < w; pix_x++) {
-                            for (int pix_y = 0; pix_y < h; pix_y++) {
-                                bmp.setPixel(
-                                        pix_x,
-                                        pix_y,
-                                        Color.argb(
-                                                255,
-                                                (0x000000FF & ((int)obj_byt[k])),
-                                                (0x000000FF & ((int)obj_byt[k+1])),
-                                                (0x000000FF & ((int)obj_byt[k+2])))
-                                );
-                                k += 3;
+                        int msg_size = w*h*3+2;
+                        if (msg_size <= obj_buff.length()) {
+                            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                            Bitmap bmp = Bitmap.createBitmap(w, h, conf);
+                            int k = 2;
+                            for (int pix_x = 0; pix_x < w; pix_x++) {
+                                for (int pix_y = 0; pix_y < h; pix_y++) {
+                                    bmp.setPixel(
+                                            pix_x,
+                                            pix_y,
+                                            Color.argb(
+                                                    255,
+                                                    (0x000000FF & ((int) obj_buff.get(k))),
+                                                    (0x000000FF & ((int) obj_buff.get(k + 1))),
+                                                    (0x000000FF & ((int) obj_buff.get(k + 2))))
+                                    );
+                                    k += 3;
+                                }
                             }
-                        }
 
-                        BitmapDrawable ob = new BitmapDrawable(getResources(), bmp);
-                        layout.setBackground(ob);
+                            BitmapDrawable ob = new BitmapDrawable(getResources(), bmp);
+                            layout.setBackground(ob);
+                        } else {
+                            Log.d("IOIO", "problem decoding image");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     }
                 });
+            }
             }
 
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {

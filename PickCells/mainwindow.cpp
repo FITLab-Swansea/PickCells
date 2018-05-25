@@ -46,7 +46,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         if (socket->isOpen()) {
 //            QPixmap pix(":/imgs/settings.png");
 //            pix = pix.scaled(128,128);
-//            QByteArray data(128*128*3 + 2,'\0');
+//            QByteArray data(128*128*3 + 2 + 1,'\n');
 //            data[0] = (unsigned int) 128;
 //            data[1] = (unsigned int) 128;
 //            int k = 2;
@@ -97,7 +97,6 @@ void MainWindow::bytesWritten(qint64 bytes) {
 void MainWindow::readyRead() {
     qDebug() << "Reading...";
     QByteArray msg = socket->readAll();
-    qDebug() << msg;
 
     if (msg.length()>5) {
         if (msg.left(5) == "conf:") {
@@ -109,6 +108,8 @@ void MainWindow::readyRead() {
             states->setJsonStates(jsonObject);
             states->updateStates();
         }
+    } else {
+        qDebug() << msg;
     }
 }
 
@@ -117,7 +118,7 @@ void MainWindow::handleVisualUpdate(QString str, QPixmap * pix_ptr) {
         QPixmap pix = pix_ptr->scaled(128,128);
         int size_id = str.length() + 3 + 2;
         // "img:charoftheid:whrgbrgbrgb...
-        QByteArray data(128*128*3 + 2 + size_id,'\0');
+        QByteArray data(128*128*3 + 2 + size_id + 1,'\n');
 
         data[0] = 'i';
         data[1] = 'm';
