@@ -316,7 +316,7 @@ function handle_side(message) {
     clearTimeout(buffer_qt);
   }
   side_msgs.push(message);
-  buffer_qt = setTimeout(send_configuration_qt, 5000);
+  buffer_qt = setTimeout(send_configuration_qt, 500);
 }
 
 io.on('connection', function(socket){
