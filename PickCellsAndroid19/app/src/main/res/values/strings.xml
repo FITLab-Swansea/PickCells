@@ -5,4 +5,5 @@
     <string name="title_activity_led_control">ledControl</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="title_activity_sides_debug">SidesDebug</string>
+    <string name="title_activity_dial_menu">DialMenu</string>
 </resources>

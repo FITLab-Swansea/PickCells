@@ -39,6 +39,9 @@ public class DeviceList extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
 
+//        Intent i = new Intent(DeviceList.this, DialMenu.class);
+//        startActivity(i);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //Calling widgets

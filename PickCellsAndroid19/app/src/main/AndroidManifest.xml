@@ -31,12 +31,14 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/Theme.NoTitle">
-        </activity>
+            android:theme="@style/Theme.NoTitle"></activity>
         <activity
             android:name=".SidesDebug"
-            android:theme="@style/Theme.NoTitle">
-        </activity>
+            android:theme="@style/Theme.NoTitle"></activity>
+        <activity
+            android:name=".DialMenu"
+            android:label="@string/title_activity_dial_menu"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

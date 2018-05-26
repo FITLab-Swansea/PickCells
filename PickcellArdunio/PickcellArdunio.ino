@@ -18,6 +18,7 @@ void setup() {
   pinMode(A3, OUTPUT);
   pinMode(A4, OUTPUT);
   pinMode(A5, OUTPUT);
+  pinMode(2, INPUT_PULLUP);
   dialValueNew = analogRead(A5);
   dialValueCurrent = analogRead(A5);
   for (int i=0; i<5; i++) {
@@ -116,6 +117,8 @@ void loop() {
     readDial();
 
     // debugLDRs();
+
+    Serial.println(digitalRead(2));
     checkSides();
     delay(100);
 }

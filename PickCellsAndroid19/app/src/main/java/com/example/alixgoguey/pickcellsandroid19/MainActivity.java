@@ -124,7 +124,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
         // Grab references to UI elements.
         messages = (TextView) findViewById(R.id.messages);
-        messages.setText("No Active Side");
+        messages.setText("No Changes");
         input = (EditText) findViewById(R.id.editText);
 
         buttonSend = (Button) findViewById(R.id.button);
@@ -154,19 +154,21 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                     int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
                     if (endOfLineIndex > 0) {                                           // make sure there data before ~
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-                        // Log.v("Handler", "readMessage: "+readMessage);
+                        Log.v("Handler", "recDataString.charAt(0): "+recDataString.charAt(0));
                         if (recDataString.charAt(0) == '#')	{
+                            Log.v("Handler", "readMessage: "+readMessage);
                             if (recDataString.charAt(2) == ':') {
-                                String side = recDataString.substring(1,dataInPrint.length());
+                                String side = recDataString.substring(1,2);
                                 String attachDirection = recDataString.substring(3, dataInPrint.length());
                                 // Log.v("Handler", cubeID + " : "+attachDirection);
-                                // Log.v("Handler", "Active Side: " + side + "= " + attachDirection);
+                                Log.v("Handler", "Active Side: " + side);
+                                messages.setText("Active Side: " + side);
 
                                 try {
                                     activeSides[Integer.parseInt(side)] = Integer.parseInt(attachDirection);
                                     newCubeAdd(Integer.parseInt(side));
                                 } catch (NumberFormatException e) {
-                                    e.printStackTrace();
+                                    Log.v("Handler", "Parse int error");
                                 }
 
 
@@ -183,7 +185,6 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                                 if (emptySides == 4){
                                     messages.setText("No Active Side");
                                 }
-                                emptySides=0;
                             }
 
 //                            viewGroup.setBackgroundColor(Color.argb(255, Integer.parseInt(sensor0), 0, 0));
