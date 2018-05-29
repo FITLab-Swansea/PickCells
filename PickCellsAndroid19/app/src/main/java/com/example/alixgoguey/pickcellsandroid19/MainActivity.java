@@ -182,16 +182,16 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
 
                                 int emptySides = 0;
-                                for (int i = 0; i < 4; i++){
+                                for (int i = 0; i < 5; i++){
                                     Log.v("Handler", "Active Side: " + activeSides[i]);
                                     if (activeSides[i] == 1) {
-                                        messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3]);
+                                        messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3] + ", " + activeSides[4]);
 
                                     } else {
                                         emptySides++;
                                     }
                                 }
-                                if (emptySides == 4){
+                                if (emptySides == 5){
                                     messages.setText("No Active Side");
                                 }
                             }
