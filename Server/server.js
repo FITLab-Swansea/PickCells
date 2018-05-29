@@ -19,6 +19,10 @@ var list_watch_client = {};
 var list_imei_client = {};
 var qt_client = null;
 
+var watch_params = {
+  'touch_framerate': 5 // in Hz -1 for normal frame rate
+};
+
 var buffer_qt = null;
 var side_msgs = [];
 var configuration = {'devices':[], 'watches': []};
@@ -324,7 +328,7 @@ io.on('connection', function(socket){
 
   list_watch_client[socket.id] = {'socket': socket}
 
-  socket.emit('event', {"id": socket.id});
+  socket.emit('event', {"id": socket.id, 'params': watch_params});
 
   socket.on('connected', function(data) {
       datelog("Client ("+data["IMEI"]+") says: "+data["Hi"]);
@@ -343,6 +347,7 @@ io.on('connection', function(socket){
       datelog("Client ("+data["IMEI"]+") says: Touch frame!");
       datelog("Client ("+data["IMEI"]+")         x: "+data["x"]);
       datelog("Client ("+data["IMEI"]+")         y: "+data["y"]);
+      datelog("Client ("+data["IMEI"]+")        id: "+data["id"]);
       datelog("Client ("+data["IMEI"]+")      type: "+data["type"]);
   });
     

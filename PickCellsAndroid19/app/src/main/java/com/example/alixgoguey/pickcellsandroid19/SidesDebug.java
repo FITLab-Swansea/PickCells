@@ -33,7 +33,8 @@ public class SidesDebug extends Activity implements View.OnClickListener{
     Socket socket;
     String IMEI = null;
     JSONArray obj_buff;
-    String obj_str;
+    String watch_id = "";
+    long touch_framerate_ms = (long) -1;
 
     boolean[] activeSides = new boolean[6];
 
@@ -100,9 +101,13 @@ public class SidesDebug extends Activity implements View.OnClickListener{
             public void call(Object... args) {
                 JSONObject obj = (JSONObject) args[0];
                 try {
-                    obj_str = (String) obj.get("id");
+                    watch_id = obj.getString("id"); // get node server ID
+                    obj = obj.getJSONObject("params"); // get parameters
+                    touch_framerate_ms = (long) (1000 / Integer.parseInt(obj.getString("touch_framerate")));
                 } catch (JSONException e) {
-                    obj_str = null;
+                    obj = null;
+                    watch_id = "";
+                    touch_framerate_ms = (long) -1;
                 }
 
                 runOnUiThread(new Runnable() {
@@ -132,8 +137,7 @@ public class SidesDebug extends Activity implements View.OnClickListener{
             if (obj_buff != null) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                    String s = "Hello World!";
-                    cubeIDLable.setText(s + "\n" + obj_buff.length());
+                    cubeIDLable.setText("buf len: " + obj_buff.length());
 
                     Log.d("IOIO", String.valueOf(obj_buff.length()));
 

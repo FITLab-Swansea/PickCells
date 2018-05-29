@@ -42,11 +42,18 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+
+import java.lang.*;
+
+import static android.view.KeyEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_UP;
 
 public class MainActivity extends Activity implements View.OnClickListener, View.OnTouchListener {
 
@@ -71,7 +78,9 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     Socket socket;
 
     JSONArray obj_buff;
-    String obj_str;
+    String watch_id = "";
+    long touch_framerate_ms = (long) -1;
+    Map<Integer, Long> framerate_map = new HashMap<Integer, Long>();
 
     String IMEI = null;
 
@@ -234,15 +243,18 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             public void call(Object... args) {
                 JSONObject obj = (JSONObject) args[0];
                 try {
-                    obj_str = (String) obj.get("id");
+                    watch_id = obj.getString("id"); // get node server ID
+                    obj = obj.getJSONObject("params"); // get parameters
+                    touch_framerate_ms = (long) (1000 / Integer.parseInt(obj.getString("touch_framerate")));
                 } catch (JSONException e) {
-                    obj_str = null;
+                    obj = null;
+                    watch_id = "";
+                    touch_framerate_ms = (long) -1;
                 }
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        String s = "Hello World!";
-                        textView.setText(s + "\n" + obj_str);
+                        textView.setText(watch_id);
                     }
                 });
             }
@@ -264,8 +276,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             if (obj_buff != null) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                    String s = "Hello World!";
-                    textView.setText(s + "\n" + obj_buff.length());
+                    textView.setText("buf len: " + obj_buff.length());
 
                     Log.d("IOIO", String.valueOf(obj_buff.length()));
 
@@ -314,8 +325,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             public void call(Object... args) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        String s = "Hello World!";
-                        textView.setText(s + "\nDisconnected...");
+                        textView.setText("Disconnected...");
                     }
                 });
             }
@@ -379,6 +389,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                 return "West";
             case 4:
                 return "Bottom";
+            case 5:
+                return "Top";
         }
         return "";
     }
@@ -402,33 +414,16 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        try {
-            int bytesAvailable = btSocket.getInputStream().available();
-
-            byte[] packetBytes = new byte[2];
-            Log.v("btInput", "bytesAvailable: "+bytesAvailable);
-
-            if (bytesAvailable > 0) {
-                btSocket.getInputStream().read(packetBytes);
-                String str = new String(packetBytes, "UTF-8");
-                Log.v("btInput", "msg: "+str);
-                textView.setText("Face: "+str);
-            }
-
-        } catch (Exception e) {
-            // ADD THIS TO SEE ANY ERROR
-            Log.v("btInput", "ERROR");
-            e.printStackTrace();
-        }
-
         // TODO: add code to send the active side
-        if (motionEvent.getPointerId(motionEvent.getActionIndex()) == 0) {
+        int ptr_id = motionEvent.getPointerId(motionEvent.getActionIndex());
+        if (ptr_id == 0) {
             // Sending an object
             JSONObject obj = new JSONObject();
             JSONObject touch = new JSONObject();
             try {
                 obj.put("x", motionEvent.getX());
                 obj.put("y", motionEvent.getY());
+                obj.put("id", ptr_id);
                 obj.put("type", motionEvent.getAction());
 
                 obj.put("IMEI", getDeviceIMEI());
@@ -437,11 +432,21 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                 e.printStackTrace();
             }
 
-            //Log.d("IOIO", " touch frame");
-            socket.emit("touchframe", obj);
+            if (!framerate_map.containsKey(ptr_id)) {
+                framerate_map.put(ptr_id, (long) 0);
+            }
+            long elapsed = System.currentTimeMillis() - framerate_map.get(ptr_id);
+
+
+            if ((touch_framerate_ms == -1) ||
+                (motionEvent.getAction() == ACTION_DOWN) ||
+                (motionEvent.getAction() == ACTION_UP) ||
+                (elapsed >= touch_framerate_ms)) {
+                framerate_map.put(ptr_id, System.currentTimeMillis());
+                socket.emit("touchframe", obj);
+            }
         }
 
-        newCubeAdd(2);
         return true;
     }
 
