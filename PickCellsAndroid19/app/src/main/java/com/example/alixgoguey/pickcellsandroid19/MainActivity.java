@@ -10,9 +10,6 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,23 +29,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 
 import java.lang.*;
 
@@ -75,19 +66,13 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     Button buttonSend;
     TextView textView;
     RelativeLayout layout;
-    Socket socket;
 
-    JSONArray obj_buff;
-    String watch_id = "";
-    long touch_framerate_ms = (long) -1;
+    CommunicationModule com = null;
     Map<Integer, Long> framerate_map = new HashMap<Integer, Long>();
 
     String IMEI = null;
 
     int dialValue;
-
-//    CellSensor cell_sensor = null;
-
 
 
     // UI elements
@@ -210,129 +195,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             }
         };
 
+        com = new CommunicationModule(this,null);
 
-        try {
-
-            // socket = IO.socket("http://172.20.10.2:9000");
-            // socket = IO.socket("http://192.168.43.74:9000");
-            // socket = IO.socket("http://192.168.0.26:9000");
-            socket = IO.socket("http://192.168.1.100:9000");
-
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-                // Sending an object
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put("Hi", "I'm a watch");
-                    obj.put("IMEI", getDeviceIMEI());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                socket.emit("connected", obj);
-            }
-
-        }).on("event", new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-                JSONObject obj = (JSONObject) args[0];
-                try {
-                    watch_id = obj.getString("id"); // get node server ID
-                    obj = obj.getJSONObject("params"); // get parameters
-                    touch_framerate_ms = (long) (1000 / Integer.parseInt(obj.getString("touch_framerate")));
-                } catch (JSONException e) {
-                    obj = null;
-                    watch_id = "";
-                    touch_framerate_ms = (long) -1;
-                }
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        textView.setText(watch_id);
-                    }
-                });
-            }
-
-        }).on("qt", new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-            JSONObject obj = (JSONObject) args[0];
-            obj_buff = null;
-            try {
-                obj = new JSONObject(obj.getString("msg"));
-                obj_buff = obj.getJSONArray("data");
-            } catch (JSONException e) {
-                Log.d("IOIO", "problem retrieving byte array");
-                obj_buff = null;
-            }
-
-            if (obj_buff != null) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                    textView.setText("buf len: " + obj_buff.length());
-
-                    Log.d("IOIO", String.valueOf(obj_buff.length()));
-
-                    try {
-                        int w = (0x000000FF & ((int) obj_buff.get(0)));//Integer.parseInt(strs[0]);
-                        int h = (0x000000FF & ((int) obj_buff.get(1)));//Integer.parseInt(strs[1]);
-                        Log.d("IOIO", "width = " + w);
-                        Log.d("IOIO", "height = " + h);
-
-                        int msg_size = w*h*3+2;
-                        if (msg_size <= obj_buff.length()) {
-                            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-                            Bitmap bmp = Bitmap.createBitmap(w, h, conf);
-                            int k = 2;
-                            for (int pix_x = 0; pix_x < w; pix_x++) {
-                                for (int pix_y = 0; pix_y < h; pix_y++) {
-                                    bmp.setPixel(
-                                            pix_x,
-                                            pix_y,
-                                            Color.argb(
-                                                    255,
-                                                    (0x000000FF & ((int) obj_buff.get(k))),
-                                                    (0x000000FF & ((int) obj_buff.get(k + 1))),
-                                                    (0x000000FF & ((int) obj_buff.get(k + 2))))
-                                    );
-                                    k += 3;
-                                }
-                            }
-
-                            BitmapDrawable ob = new BitmapDrawable(getResources(), bmp);
-                            layout.setBackground(ob);
-                        } else {
-                            Log.d("IOIO", "problem decoding image");
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    }
-                });
-            }
-            }
-
-        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        textView.setText("Disconnected...");
-                    }
-                });
-            }
-        });
-        socket.connect();
-
-//        cell_sensor = new CellSensor();
     }
 
 
@@ -374,7 +238,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             e.printStackTrace();
         }
 
-        socket.emit("clicked", obj);
+        com.emitSocket("clicked", obj);
     }
 
     public String indexToChar(int index){
@@ -409,7 +273,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             e.printStackTrace();
         }
 
-        socket.emit("sideChange", obj);
+        com.emitSocket("sideChange", obj);
     }
 
     @Override
@@ -438,12 +302,13 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             long elapsed = System.currentTimeMillis() - framerate_map.get(ptr_id);
 
 
-            if ((touch_framerate_ms == -1) ||
+            if ((com.touch_framerate_ms == -1) ||
                 (motionEvent.getAction() == ACTION_DOWN) ||
                 (motionEvent.getAction() == ACTION_UP) ||
-                (elapsed >= touch_framerate_ms)) {
+                (elapsed >= com.touch_framerate_ms)) {
                 framerate_map.put(ptr_id, System.currentTimeMillis());
-                socket.emit("touchframe", obj);
+
+                com.emitSocket("touchframe", obj);
             }
         }
 
@@ -453,69 +318,12 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     protected void onResume() {
         super.onResume();
         Log.d("SENSOR", "resume ??");
-//        cell_sensor.mSensorManager.registerListener(
-//                cell_sensor,
-//                cell_sensor.accelerometer,
-//                SensorManager.SENSOR_DELAY_NORMAL
-//        );
     }
 
     protected void onPause() {
         super.onPause();
         Log.d("SENSOR", "pause ??");
-//        cell_sensor.mSensorManager.unregisterListener(cell_sensor);
     }
-
-
-//    private class CellSensor implements SensorEventListener {
-//        SensorManager mSensorManager = null;
-//        Sensor accelerometer = null;
-//
-//        float[] acc;
-//
-//        public CellSensor() {
-//            mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-//            accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-//            Log.d("SENSOR", "creation ??");
-//            Log.d("SENSOR", "sensor list: "+mSensorManager.getSensorList(Sensor.TYPE_ALL).toString());
-////            Log.d("SENSOR", "acc sensor: "+accelerometer.toString());
-////            mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-////            mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-//        }
-//
-//        @Override
-//        public void onSensorChanged(SensorEvent sensorEvent) {
-//            Log.d("SENSOR", "hey yo acceleroooo ??");
-//
-//            if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-//                Log.d("SENSOR", "hey yeah");
-//                acc = sensorEvent.values;
-//
-//                // Sending an object
-//                JSONObject obj = new JSONObject();
-//                JSONObject touch = new JSONObject();
-//
-//                try {
-//                    obj.put("ax", acc[0]);
-//                    obj.put("ay", acc[1]);
-//                    obj.put("az", acc[2]);
-//
-//                    obj.put("IMEI", getDeviceIMEI());
-//                    obj.put("Touch", touch);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                socket.emit("sensor", obj);
-//            }
-//        }
-//
-//        @Override
-//        public void onAccuracyChanged(android.hardware.Sensor sensor, int i) {
-//            // Nothing
-//            Log.d("SENSOR", "Accuracy");
-//        }
-//    };
 
     // fast way to call Toast
     private void msg(String s)
