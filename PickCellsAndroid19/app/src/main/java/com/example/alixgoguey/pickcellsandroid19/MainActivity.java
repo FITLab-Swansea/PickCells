@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -48,46 +49,23 @@ import static android.view.MotionEvent.ACTION_UP;
 
 public class MainActivity extends Activity implements View.OnClickListener, View.OnTouchListener {
 
-    //bluetooth Stuff
-    ImageButton On, Off, Discnt, Abt;
     String address = null;
-    private ProgressDialog progress;
-    BluetoothAdapter myBluetooth = null;
-    BluetoothSocket btSocket = null;
-    private boolean isBtConnected = false;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    ConnectedThread readBT;
-    TextView tb;
-
-    Handler bluetoothIn;
-    final int handlerState = 0;        				 //used to identify handler message
-    private StringBuilder recDataString = new StringBuilder();
-
+    SidesConnectThread sidesConnectThread;
     Button buttonSend;
     TextView textView;
     RelativeLayout layout;
-
     CommunicationModule com = null;
     Map<Integer, Long> framerate_map = new HashMap<Integer, Long>();
-
     String IMEI = null;
 
-    int dialValue;
+//    int dialValue;
 
-
-    // UI elements
     private TextView messages;
     private EditText input;
 
-    // BTLE state
-    private BluetoothAdapter adapter;
-    private BluetoothGatt gatt;
-    private BluetoothGattCharacteristic tx;
-    private BluetoothGattCharacteristic rx;
 
-    int activeSides[] = new int[5];
-
-
+    ArduinoModule arduinoModule;
+    Handler uiUpdate;
 
 
     @SuppressLint("MissingPermission")
@@ -114,95 +92,46 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        adapter = BluetoothAdapter.getDefaultAdapter();
 
         // Grab references to UI elements.
-        messages = (TextView) findViewById(R.id.messages);
+        messages = findViewById(R.id.messages);
         messages.setText("No Changes");
-        input = (EditText) findViewById(R.id.editText);
+        input = findViewById(R.id.editText);
 
-        buttonSend = (Button) findViewById(R.id.button);
+        buttonSend = findViewById(R.id.button);
         buttonSend.setOnClickListener(this);
 
-        textView = (TextView) findViewById(R.id.textView2);
-        layout = (RelativeLayout)findViewById(R.id.main_layout);
+        textView = findViewById(R.id.textView2);
+        layout = findViewById(R.id.main_layout);
 
         layout.setOnTouchListener(this);
 
-        Intent newint = getIntent();
-        if (newint.getStringExtra(DeviceList.EXTRA_ADDRESS)!=null) {
-            address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS); //receive the address of the bluetooth device
-            new ConnectBT().execute(); //Call the class to connect
+        Intent newInt = getIntent();
+        if (newInt.getStringExtra(DeviceList.EXTRA_ADDRESS)!=null) {
+            address = newInt.getStringExtra(DeviceList.EXTRA_ADDRESS); //receive the address of the bluetooth device
         }
+
         final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
                 .findViewById(android.R.id.content)).getChildAt(0);
-        bluetoothIn = new Handler() {
-            public void handleMessage(android.os.Message msg) {
-                if (msg.what == handlerState) {										//if message is what we want
-                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
 
-                    recDataString.append(readMessage);
+        arduinoModule = new ArduinoModule(address);
+        com = new CommunicationModule(this,null);
 
-//                  textViewtView.setText("Sensor Voltage = " + readMessage);	//update the textviews with sensor values
-//                  viewGroup.setBackgroundColor(Color.argb(255, Integer.parseInt(readMessage), 0, 0));
-                    int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
-                    if (endOfLineIndex > 0) {                                           // make sure there data before ~
-                        String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-                        Log.v("Handler", "recDataString.charAt(0): "+recDataString.charAt(0));
-                        if (recDataString.charAt(0) == '#')	{
-                            Log.v("Handler", "readMessage: "+readMessage);
-                            if (recDataString.charAt(2) == ':') {
-                                String side = recDataString.substring(1,2);
-                                String attachDirection = recDataString.substring(3, dataInPrint.length());
-                                // Log.v("Handler", cubeID + " : "+attachDirection);
-                                Log.v("Handler", "Active Side: " + side);
-                                messages.setText("Active Side: " + side);
+        sidesConnectThread = new SidesConnectThread();
+        new Thread(sidesConnectThread).start();
 
-                                try {
-                                    activeSides[Integer.parseInt(side)] = Integer.parseInt(attachDirection);
-                                    newCubeAdd(Integer.parseInt(side));
-                                } catch (NumberFormatException e) {
-                                    Log.v("Handler", "Parse int error");
-                                }
-
-
-                                int emptySides = 0;
-                                for (int i = 0; i < 5; i++){
-                                    Log.v("Handler", "Active Side: " + activeSides[i]);
-                                    if (activeSides[i] == 1) {
-                                        messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3] + ", " + activeSides[4]);
-
-                                    } else {
-                                        emptySides++;
-                                    }
-                                }
-                                if (emptySides == 5){
-                                    messages.setText("No Active Side");
-                                }
-                            }
-
-//                            viewGroup.setBackgroundColor(Color.argb(255, Integer.parseInt(sensor0), 0, 0));
-
-                        }
-                        if (recDataString.charAt(0) == '*')	{
-                            String dial = recDataString.substring(1,2);
-                            Log.v("Handler", "Dial Value: " + dialValue);
-                            dialValue = Integer.parseInt(dial);
-                        }
-                        recDataString.delete(0, recDataString.length()); 					//clear all string data
-                    }
+        uiUpdate = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (arduinoModule.emptySides() == 0) {
+                    messages.setText("No Active Side");
+                } else {
+                    messages.setText(arduinoModule.printActiveSides());
                 }
             }
         };
 
-        com = new CommunicationModule(this,null);
-
     }
-
-
-
-
-    // Boilerplate code from the activity creation:
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -241,31 +170,14 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         com.emitSocket("clicked", obj);
     }
 
-    public String indexToChar(int index){
-        switch (index){
-            case 0:
-                return "North";
-            case 1:
-                return "East";
-            case 2:
-                return "South";
-            case 3:
-                return "West";
-            case 4:
-                return "Bottom";
-            case 5:
-                return "Top";
-        }
-        return "";
-    }
 
 
     public void newCubeAdd(int side) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("IMEI", getDeviceIMEI());
-            obj.put("side", indexToChar(side));
-            obj.put("active", activeSides[side]);
+            obj.put("side", arduinoModule.SIDENAMES[side]);
+            obj.put("active", arduinoModule.getActiveSides()[side]);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -326,116 +238,21 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
     // fast way to call Toast
-    private void msg(String s)
-    {
+    public  void msg(String s) {
         Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
 
     //create new class for connect thread
-    private class ConnectedThread extends Thread {
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-
-        //creation of the connect thread
-        public ConnectedThread(BluetoothSocket socket) {
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            try {
-                //Create I/O streams for connection
-                tmpIn = btSocket.getInputStream();
-                tmpOut = btSocket.getOutputStream();
-            } catch (IOException e) { }
-
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-            Log.v("ConnectedThread",  "Constuctor");
-        }
-
-
-
+    private class SidesConnectThread extends Thread {
         public void run() {
-            byte[] buffer = new byte[256];
-            int bytes;
-            // Keep looping to listen for received messages
-            while (btSocket!=null) {
-                try {
-                    bytes = mmInStream.read(buffer);        	//read bytes from input buffer
-                    String readMessage = new String(buffer, 0, bytes);
-                    // Send the obtained bytes to the UI Activity via handler
-                    bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
-                    Log.v("ConnectedThread", "msg: "+readMessage);
-
-                } catch (IOException e) {
-                    Log.v("ConnectedThread", "Error");
+            while(true) {
+                if (arduinoModule.isNewSide()){
+                    newCubeAdd(arduinoModule.getLastSide());
+                    uiUpdate.sendEmptyMessage(0);
                 }
+                arduinoModule.setNewSide(false);
             }
         }
-        //write method
-        public void write(String input) {
-            byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
-            try {
-                mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
-            } catch (IOException e) {
-                //if you cannot write, close the application
-                Toast.makeText(getBaseContext(), "Connection Failure", Toast.LENGTH_LONG).show();
-                finish();
 
-            }
-        }
-    }
-
-
-    private class ConnectBT extends AsyncTask<Void, Void, Void> {
-        private boolean ConnectSuccess = true; //if it's here, it's almost connected
-
-        @Override
-        protected void onPreExecute()
-        {
-            progress = ProgressDialog.show(MainActivity.this, "Connecting...", "Please wait!!!");  //show a progress dialog
-        }
-
-        @Override
-        protected Void doInBackground(Void... devices) //while the progress dialog is shown, the connection is done in background
-        {
-            try
-            {
-                if (btSocket == null || !isBtConnected)
-                {
-                    myBluetooth = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
-                    BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
-                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
-                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-                    btSocket.connect();//start connection
-                }
-            }
-            catch (IOException e)
-            {
-                ConnectSuccess = false;//if the try failed, you can check the exception here
-            }
-
-
-            // new Thread(p).start();
-            readBT = new ConnectedThread(btSocket);
-            new Thread(readBT).start();
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void result) //after the doInBackground, it checks if everything went fine
-        {
-            super.onPostExecute(result);
-
-            if (!ConnectSuccess)
-            {
-                msg("Connection Failed. Is it a SPP Bluetooth? Try again.");
-                finish();
-            }
-            else
-            {
-                msg("Connected.");
-                isBtConnected = true;
-            }
-            progress.dismiss();
-        }
     }
 }
