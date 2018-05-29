@@ -578,8 +578,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
 
-    private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
-    {
+    private class ConnectBT extends AsyncTask<Void, Void, Void> {
         private boolean ConnectSuccess = true; //if it's here, it's almost connected
 
         @Override
