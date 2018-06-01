@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>
-int ldrs[5]; 
 
 int reeds[4]; 
 int activeSides[5]; 
@@ -7,10 +6,7 @@ int sensorValue[5];
 
 int bottomLDR;
 int sensorMax; 
-int sensorMin; 
-
-int dialValueCurrent;
-int dialValueNew;
+int sensorMin;
 
 void setup() {  
   Serial.begin(9600);
@@ -20,10 +16,7 @@ void setup() {
   pinMode(3, INPUT_PULLUP);
   pinMode(4, INPUT_PULLUP);
   pinMode(5, INPUT_PULLUP);
-    
-//  dialValueNew = analogRead(A5);
-//  dialValueCurrent = analogRead(A5);
-
+  
   while (millis() < 5000) {
     bottomLDR = analogRead(A0);
     if (bottomLDR > sensorMax) {
@@ -33,7 +26,6 @@ void setup() {
       sensorMin = bottomLDR;
     }
   }
-  Serial.print("Ready!");
 }
 
 void checkSides(){
@@ -60,28 +52,13 @@ int checkBottom(){
   }
 }
 
-void sendDialValue(){
-    Serial.print('*');
-    Serial.print("<DIAL_VALUE>");
-    Serial.print('~'); //used as an end of transmission character - used in app for string length
-    Serial.println();
-}
-
 void sendValue(int side){
     Serial.print('#');
     Serial.print(side);
     Serial.print(":");
     Serial.print(activeSides[side]);
-    Serial.print('~'); //used as an end of transmission character - used in app for string length
+    Serial.print('~');
     Serial.println();
-}
-
-void readDial(){
-    dialValueNew = map (analogRead(A5), 1, 980, 0, 255);
-    if (dialValueCurrent != dialValueNew){
-      dialValueCurrent = dialValueNew;
-      sendDialValue();
-    }
 }
 
 void readReeds(){
@@ -108,11 +85,8 @@ void readLRD(){
 }
 
 void loop() {
-    // readDial();
-//    Serial.println(bottomLDR);
     readReeds();
     readLRD();
-//    printReeds();
     checkSides();
     checkBottom();
     delay(100);

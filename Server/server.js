@@ -20,7 +20,9 @@ var list_imei_client = {};
 var qt_client = null;
 
 var watch_params = {
-  'touch_framerate': 5 // in Hz -1 for normal frame rate
+  'touch_framerate': 5, // in Hz -1 for normal frame rate
+  //'354082061274655': {0:2, 1:1, 2:0, 3:3}, // North to South, South to North
+  '354082061274638': {0:2, 1:3, 2:0, 3:1}  // North to South, South to North, East to West, West to East
 };
 
 var buffer_qt = null;
@@ -39,8 +41,8 @@ var configuration = {'devices':[], 'watches': []};
 //                                 id3: {'x':-1, 'y':1, 'z':0, 'B':null, 'T':id2, 'N':null, 'S':null, 'E':id1, 'W':null}
 //                               }
 //               }
-// 
-// 
+//
+//
 //             ],
 //  'watches': [id1, id2, id3]
 // }
@@ -350,7 +352,7 @@ io.on('connection', function(socket){
       datelog("Client ("+data["IMEI"]+")        id: "+data["id"]);
       datelog("Client ("+data["IMEI"]+")      type: "+data["type"]);
   });
-    
+
   socket.on('sideChange', function(data) {
       datelog("Client ("+data["IMEI"]+") says: sideChange!");
       datelog("Client ("+data["IMEI"]+")        side: "+data["side"]);   // "North" "East" "South" "West" "Bottom"
@@ -438,7 +440,7 @@ function onClientConnected(socket) {
       }
     }
   });
-  
+
   socket.on('end', () => {
     datelog(clientName + ' disconnected.');
     qt_client = null;
