@@ -45,7 +45,9 @@ public:
 
     void setDebug(bool val);
     bool getDebug() { return _debug; }
-    void setDebugConf(int ind);
+    void setApplication(int ind);
+
+    bool getCellTopLeft(QString id, int *x, int *y);
 
     QList<Brick*> _bricks_to_delete;
 
@@ -62,7 +64,7 @@ private:
     void resetCurrentStates();
 
     bool _debug;
-    int _debug_conf;
+    int _appli;
 
     QList<Cell*> _available_cells;
 

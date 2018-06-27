@@ -34,7 +34,8 @@ SOURCES += \
     controller/appscreen.cpp \
     view/widgets/button.cpp \
     view/scenes/testscene.cpp \
-    view/scenes/colorscene.cpp
+    view/scenes/colorscene.cpp \
+    view/widgets/swatch.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     view/widgets/button.h \
     view/scenes/scene.h \
     view/scenes/testscene.h \
-    view/scenes/colorscene.h
+    view/scenes/colorscene.h \
+    view/widgets/swatch.h
 
 FORMS += \
         mainwindow.ui

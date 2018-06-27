@@ -18,7 +18,7 @@ public:
     virtual void initializeScene(int brick_size) = 0;
     virtual QList<QRectF> handleEvent(int x, int y, bool release) = 0;
 
-    void setWidgets(QGraphicsScene *scene) {
+    void setWidgets_scene(QGraphicsScene *scene) {
         if (!is_set) {
             for (int k = 0; k < button_list.size(); k++) {
                 scene->addItem(button_list[k]);
@@ -27,7 +27,7 @@ public:
         }
     }
 
-    void unsetWidgets(QGraphicsScene *scene) {
+    void unsetWidgets_scene(QGraphicsScene *scene) {
         if (is_set) {
             for (int k = 0; k < button_list.size(); k++) {
                 scene->removeItem(button_list[k]);
@@ -43,6 +43,14 @@ public:
         button_list.clear();
     }
 
+    void handle_configuration_scene() {}
+    void handle_action_scene(QString action) { qDebug() << "Error action scene!" << action << "does not exist"; }
+
+    virtual void setWidgets(QGraphicsScene *scene) = 0;
+    virtual void unsetWidgets(QGraphicsScene *scene) = 0;
+    virtual void handle_configuration() = 0;
+    virtual void handle_action(QString action) = 0;
+
     bool isSet() { return is_set; }
 
 signals:
@@ -51,6 +59,8 @@ signals:
 protected:
     bool is_set;
     QList<Button*> button_list;
+
+    int _brick_size;
 };
 
 #endif // SCENE_H

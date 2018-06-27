@@ -30,6 +30,10 @@ Button::Button(QGraphicsItem *parent, int w, int h)
     active = false;
     has_icon = false;
     action = "";
+
+    pen_background = QColor("#98BE61");
+    background = QColor("#98BE61");
+    active_background = QColor("#ACD176");
 }
 
 Button::~Button() {
@@ -45,16 +49,16 @@ void Button::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
     if (with_background) {
         if (!active) {
-            painter->fillPath(path,QBrush(QColor("#ACD176")));
+            painter->fillPath(path,QBrush(active_background));
         } else {
-            painter->fillPath(path,QBrush(QColor("#98BE61")));
+            painter->fillPath(path,QBrush(background));
         }
 
         if (has_icon) {
             painter->drawPixmap(x_icn, y_icn, w_icn, h_icn, icon);
         }
 
-        painter->setPen(QPen(QColor("#98BE61"),1));
+        painter->setPen(QPen(pen_background,1));
         painter->drawPath(path);
     } else {
         if (has_icon) {
@@ -70,6 +74,12 @@ void Button::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
 QPainterPath Button::shape() const {
     return path;
+}
+
+void Button::setColorBackground(QColor pen, QColor backgd, QColor active_backgd) {
+    pen_background = pen;
+    background = backgd;
+    active_background = active_backgd;
 }
 
 void Button::setActive(bool val) {

@@ -15,8 +15,8 @@
 #include "../controller/cellsstates.h"
 #include "../controller/appscreen.h"
 #include "scenes/scene.h"
-#include "scenes/testscene1.h"
-#include "scenes/testscene2.h"
+#include "scenes/testscene.h"
+#include "scenes/colorscene.h"
 
 #include <QDebug>
 #include <iostream>
@@ -35,6 +35,8 @@ public:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
+
+    void handle_new_touchframe(QJsonObject jsonObject);
 
     void sceneUpdate() { _scene->update(); }
 
@@ -60,8 +62,8 @@ private:
     QMap<QString, Scene*> _app_mapping;
     QString _cur_scene_name;
     Scene* _cur_scene;
-    TestScene1 _test_scene1;
-    TestScene2 _test_scene2;
+    TestScene _test_app;
+    ColorScene _color_app;
 };
 
 #endif // APPSVIEW_H

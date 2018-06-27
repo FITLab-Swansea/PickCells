@@ -1,9 +1,25 @@
-#include "testscene1.h"
+#include "testscene.h"
 
-TestScene1::TestScene1() : Scene() {
+TestScene::TestScene() : Scene() {
 }
 
-void TestScene1::initializeScene(int brick_size) {
+void TestScene::setWidgets(QGraphicsScene *scene) {
+    setWidgets_scene(scene);
+}
+
+void TestScene::unsetWidgets(QGraphicsScene *scene) {
+    unsetWidgets_scene(scene);
+}
+
+void TestScene::handle_configuration() {
+    handle_configuration_scene();
+}
+
+void TestScene::handle_action(QString action) {
+    handle_action_scene(action);
+}
+
+void TestScene::initializeScene(int brick_size) {
     deleteWidgets();
 
     // button on 1,1 and 6,1
@@ -34,7 +50,7 @@ void TestScene1::initializeScene(int brick_size) {
     button_list.append(c_but);
 }
 
-QList<QRectF> TestScene1::handleEvent(int x, int y, bool release) {
+QList<QRectF> TestScene::handleEvent(int x, int y, bool release) {
     QList<QRectF> to_update;
     bool but_active = false;
     for (int k = 0; k < button_list.size(); k++) {

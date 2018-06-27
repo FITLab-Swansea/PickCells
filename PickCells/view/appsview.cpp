@@ -12,14 +12,16 @@ AppsView::AppsView(QWidget *parent) : QGraphicsView(parent) {
     _general_update_timer = new QTimer(this);
     connect(_general_update_timer, SIGNAL(timeout()), this, SLOT(handle_general_update()));
 
-    connect(&_test_scene1, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
-
-    connect(&_test_scene2, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
-    _app_mapping["test_scene"] = &_test_scene1;
-    _app_mapping["color_scene"] = &_test_scene2;
+    connect(&_test_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_color_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    _app_mapping["app_test"] = &_test_app;
+    _app_mapping["app_color"] = &_color_app;
 
     _configuration_mapping[QPair<QString, QString>("app_test","")] = "";
     _configuration_mapping[QPair<QString, QString>("app_color","")] = "";
+
+    _cur_scene = &_test_app;
+    _cur_scene_name = "app_test";
 }
 
 AppsView::~AppsView() {
@@ -107,14 +109,13 @@ void AppsView::updateStates() {
             }
         }
 
-        _test_scene1.unsetWidgets(_scene);
-        _test_scene1.initializeScene(_brick_size);
-        _test_scene1.setWidgets(_scene);
-        _cur_scene = &_test_scene1;
-        _cur_scene_name = "conf_test1";
+        _test_app.unsetWidgets(_scene);
+        _test_app.initializeScene(_brick_size);
 
-        _test_scene2.unsetWidgets(_scene);
-        _test_scene2.initializeScene(_brick_size);
+        _color_app.unsetWidgets(_scene);
+        _color_app.initializeScene(_brick_size);
+
+        _cur_scene->setWidgets(_scene);
 
         _general_update_timer->stop();
         _general_update_timer->start(500);
@@ -143,6 +144,34 @@ void AppsView::mouseReleaseEvent(QMouseEvent *event) {
     }
 }
 
+void AppsView::handle_new_touchframe(QJsonObject jsonObject) {
+    // datelog("Client ("+data["IMEI"]+") says: Touch frame!");
+    // datelog("Client ("+data["IMEI"]+")         x: "+data["x"]); / 240
+    // datelog("Client ("+data["IMEI"]+")         y: "+data["y"]); / 240
+    // datelog("Client ("+data["IMEI"]+")        id: "+data["id"]);
+    // datelog("Client ("+data["IMEI"]+")      type: "+data["type"]);
+
+    qDebug() << jsonObject["IMEI"].toString();
+    CellsStates *states = CellsStates::getInstance();
+    int x, y;
+    bool success = states->getCellTopLeft(jsonObject["IMEI"].toString(), &x, &y);
+
+    if (success) {
+        float cell_x = (x + jsonObject["x"].toDouble()/240.0)*_brick_size;
+        float cell_y = (y + jsonObject["y"].toDouble()/240.0)*_brick_size;
+        if (jsonObject["type"].toInt() == 0) {
+            QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, QPointF(cell_x, cell_y), Qt::LeftButton, Qt::LeftButton, 0);
+            mousePressEvent(event);
+        } else if (jsonObject["type"].toInt() == 2) {
+            QMouseEvent *event = new QMouseEvent(QEvent::MouseMove, QPointF(cell_x, cell_y), Qt::LeftButton, Qt::LeftButton, 0);
+            mouseMoveEvent(event);
+        } else if (jsonObject["type"].toInt() == 1) {
+            QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonRelease, QPointF(cell_x, cell_y), Qt::LeftButton, Qt::LeftButton, 0);
+            mouseReleaseEvent(event);
+        }
+    }
+}
+
 void AppsView::handle_general_update() {
     _general_update_timer->stop();
     bool ptr_in = _mouse_ptr->isVisible();
@@ -154,14 +183,17 @@ void AppsView::handle_general_update() {
 void AppsView::handle_actions(QString action) {
     if (action != "") {
         if (_app_mapping.contains(action)) {
-            _cur_scene->unsetWidgets(_scene);
-            _cur_scene_name = action;
-            _cur_scene = _app_mapping[action];
-            _cur_scene->setWidgets(_scene);
-
+            if (_cur_scene_name != action) {
+                _cur_scene->unsetWidgets(_scene);
+                _cur_scene_name = action;
+                _cur_scene = _app_mapping[action];
+                _cur_scene->setWidgets(_scene);
+            }
+            _cur_scene->handle_configuration();
             handle_general_update();
         } else {
-            qDebug() << "Error action!" << action << "does not exist";
+            //qDebug() << "Error action!" << action << "does not exist";
+            _cur_scene->handle_action(action);
         }
     }
 }
@@ -172,14 +204,18 @@ void AppsView::handle_new_configuration(QString configuration) {
     QPair<QString, QString> key(configuration,_cur_scene_name);
     if (_configuration_mapping.contains(key)) {
         handle_actions(_configuration_mapping[key]);
+    } else if (_app_mapping.contains(configuration)) {
+        handle_actions(configuration);
     } else {
         qDebug() << "Error configuration!" << key << "does not exist";
     }
+
 }
 
 void AppsView::updateMouseEvent(QMouseEvent *event, bool release) {
+    qDebug() << "x: " << event->x() << "  y: " << event->y();
     QList<QRectF> rect_to_update;
-    if (_cur_scene) {
+    if (_cur_scene != NULL) {
         rect_to_update = _cur_scene->handleEvent(event->x(), event->y(), release);
     }
 
@@ -209,7 +245,7 @@ void AppsView::updateCells(QRectF visual_change, bool persistent) {
     QList<AppScreen*>* as = states->getAppSreens();
 
     QList<Cell*> to_update;
-    for (int k = as->size()-1; k >= 0; k--) {
+    for (int k = as->length()-1; k >= 0; k--) {
         AppScreen *s = (*as)[k];
         QRectF bbox_avt = s->avatar->rect();
         bbox_avt.setRect(bbox_avt.x()+(s->getX()+1)*_brick_size,

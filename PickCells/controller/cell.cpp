@@ -34,10 +34,11 @@ void Cell::setPixmap(QPixmap val) {
     _pixmap = val;
 
     if (_debug) {
-        QPainter painter(&val);
-        painter.drawPixmap(0,0,val.width(),val.height(),_pixmap_debug);
+        QPainter painter(&_pixmap);
+        painter.drawPixmap(0,0,_pixmap.width(),_pixmap.height(),_pixmap_debug);
     }
-    _avatar->setPixmap(val);
+
+    _avatar->setPixmap(_pixmap);
 }
 
 void Cell::setAvatarPixmap(QPixmap val) {

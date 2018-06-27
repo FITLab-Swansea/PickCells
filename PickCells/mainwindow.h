@@ -45,10 +45,14 @@ public slots:
 
     void handleVisualUpdate(QString str, QPixmap * pix_ptr);
 
+    void dummy_touch();
+
 private:
     Ui::MainWindow *ui;
 
     QTcpSocket *socket;
+
+    QList<QJsonObject> list;
 };
 
 #endif // MAINWINDOW_H

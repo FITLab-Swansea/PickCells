@@ -27,15 +27,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="debug_conf">
+         <widget class="QComboBox" name="appli">
           <item>
            <property name="text">
-            <string>Conf test 1</string>
+            <string>Test</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Conf test 2</string>
+            <string>Color</string>
            </property>
           </item>
          </widget>

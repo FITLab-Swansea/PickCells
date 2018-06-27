@@ -5,5 +5,6 @@
         <file>imgs/close.png</file>
         <file>imgs/picture.png</file>
         <file>imgs/settings.png</file>
+        <file>imgs/refresh.png</file>
     </qresource>
 </RCC>

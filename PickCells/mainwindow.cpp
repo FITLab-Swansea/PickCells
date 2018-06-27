@@ -42,6 +42,130 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         if(!socket->waitForConnected(1000)) {
             qDebug() << "Error: " << socket->errorString();
         }
+    } else if (event->key() == Qt::Key_T) {
+        QJsonObject jsonObject;
+        jsonObject.insert("IMEI","333");
+        jsonObject.insert("x",60.74688720703125);
+        jsonObject.insert("y",157.34439086914062);
+        jsonObject.insert("id",0);
+        jsonObject.insert("type",0);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",80.63599395751953);
+        jsonObject.insert("y",157.34439086914062);
+        jsonObject.insert("type",2);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",100.63599395751953);
+        jsonObject.insert("y",157.34439086914062);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",125.36514282226562);
+        jsonObject.insert("y",154.35684204101562);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",152.36514282226562);
+        jsonObject.insert("y",154.35684204101562);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",122.36514282226562);
+        jsonObject.insert("y",154.35684204101562);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",97.35906219482422);
+        jsonObject.insert("y",153.97341918945312);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",82.65560150146484);
+        jsonObject.insert("y",153.36099243164062);
+        jsonObject.insert("type",1);
+        list.push_back(jsonObject);
+
+
+        // NEW TOUCH
+        jsonObject.insert("IMEI","888");
+        jsonObject.insert("x",60.74688720703125);
+        jsonObject.insert("y",157.34439086914062);
+        jsonObject.insert("id",0);
+        jsonObject.insert("type",0);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",80.63599395751953);
+        jsonObject.insert("y",157.34439086914062);
+        jsonObject.insert("type",2);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",100.63599395751953);
+        jsonObject.insert("y",157.34439086914062);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",125.36514282226562);
+        jsonObject.insert("y",154.35684204101562);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",152.36514282226562);
+        jsonObject.insert("y",154.35684204101562);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",122.36514282226562);
+        jsonObject.insert("y",154.35684204101562);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",97.35906219482422);
+        jsonObject.insert("y",153.97341918945312);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",82.65560150146484);
+        jsonObject.insert("y",153.36099243164062);
+        jsonObject.insert("type",1);
+        list.push_back(jsonObject);
+
+        // NEW TOUCH
+        jsonObject.insert("IMEI","777");
+        jsonObject.insert("x",10.0);
+        jsonObject.insert("y",10.0);
+        jsonObject.insert("id",0);
+        jsonObject.insert("type",0);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",120.0);
+        jsonObject.insert("y",120.0);
+        jsonObject.insert("type",2);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",230.0);
+        jsonObject.insert("y",230.0);
+        jsonObject.insert("type",2);
+        list.push_back(jsonObject);
+        jsonObject.insert("x",230.0);
+        jsonObject.insert("y",230.0);
+        jsonObject.insert("type",1);
+        list.push_back(jsonObject);
+
+        // NEW TOUCH
+        jsonObject.insert("IMEI","111");
+        jsonObject.insert("x",10.0);
+        jsonObject.insert("y",10.0);
+        jsonObject.insert("id",0);
+        jsonObject.insert("type",0);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",120.0);
+        jsonObject.insert("y",120.0);
+        jsonObject.insert("type",2);
+        list.push_back(jsonObject);
+
+        jsonObject.insert("x",230.0);
+        jsonObject.insert("y",230.0);
+        jsonObject.insert("type",2);
+        list.push_back(jsonObject);
+        jsonObject.insert("x",230.0);
+        jsonObject.insert("y",230.0);
+        jsonObject.insert("type",1);
+        list.push_back(jsonObject);
+
+        QTimer::singleShot(250, this, SLOT(dummy_touch()));
+
     } else if (event->key() == Qt::Key_S) {
         if (socket->isOpen()) {
 //            QPixmap pix(":/imgs/settings.png");
@@ -107,6 +231,12 @@ void MainWindow::readyRead() {
             CellsStates *states = CellsStates::getInstance();
             states->setJsonStates(jsonObject);
             states->updateStates();
+        } else if (msg.left(6) == "touch:") {
+            msg = msg.right(msg.length()-6);
+
+            QJsonDocument jsonResponse = QJsonDocument::fromJson(QString(msg).toUtf8());
+            QJsonObject jsonObject = jsonResponse.object();
+            ui->app_view->handle_new_touchframe(jsonObject);
         }
     } else {
         qDebug() << msg;
@@ -143,5 +273,14 @@ void MainWindow::handleVisualUpdate(QString str, QPixmap * pix_ptr) {
             }
         }
         socket->write(data);
+    }
+}
+
+void MainWindow::dummy_touch() {
+    if (list.length() > 0) {
+        ui->app_view->handle_new_touchframe(list[0]);
+        list.pop_front();
+
+        QTimer::singleShot(250, this, SLOT(dummy_touch()));
     }
 }

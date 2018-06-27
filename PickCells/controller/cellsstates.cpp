@@ -230,6 +230,32 @@ void CellsStates::setApplication(int ind) {
     updateStates();
 }
 
+bool CellsStates::getCellTopLeft(QString id, int *x, int *y) {
+    if (_cell_states != NULL) {
+        int offset = 0;
+        for (int device = 0; device < getNbDevices(); device++ ) {
+            offset += 1;
+            for (int layer = 0; layer < getDeviceDepth(device); layer++) {
+                for (int row = 0; row < getDeviceHeight(device); row++) {
+                    for (int col = 0; col < getDeviceWidth(device); col++) {
+                        Cell *c = getCell(device, layer, row, col);
+                        if (c != NULL) {
+                            if (c->getCellId() == id) {
+                                *x = col + offset;
+                                *y = row + 1;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            offset += _w_devices[device];
+        }
+        return false;
+    }
+    return false;
+}
+
 void CellsStates::relayVisualUpdate(QString str, QPixmap * pix) {
     emit visualUpdate(str, pix);
 }
