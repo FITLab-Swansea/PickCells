@@ -142,6 +142,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                     String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
 
                     recDataString.append(readMessage);
+                    Log.v("Handler", readMessage);
 
 //                  textViewtView.setText("Sensor Voltage = " + readMessage);	//update the textviews with sensor values
 //                  viewGroup.setBackgroundColor(Color.argb(255, Integer.parseInt(readMessage), 0, 0));
@@ -164,7 +165,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                                     activeSides[int_side] = Integer.parseInt(attachDirection);
                                     newCubeAdd(int_side);
                                 } catch (NumberFormatException e) {
-                                    Log.v("Handler", "Parse int error");
+                                    Log.v("", "Parse int error");
                                 }
 
 

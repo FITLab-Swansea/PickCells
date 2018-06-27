@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h>
+ #include <SoftwareSerial.h>
 
 int reeds[4]; 
 int activeSides[5]; 
