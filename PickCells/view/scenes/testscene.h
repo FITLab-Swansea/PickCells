@@ -1,5 +1,5 @@
-#ifndef TESTSCENE2_H
-#define TESTSCENE2_H
+#ifndef TESTSCENE_H
+#define TESTSCENE_H
 
 #include "scene.h"
 
@@ -7,13 +7,13 @@
 #include <iostream>
 using namespace std;
 
-class TestScene2 : public Scene
+class TestScene : public Scene
 {
 public:
-    TestScene2();
+    TestScene();
 
     void initializeScene(int brick_size);
     QList<QRectF> handleEvent(int x, int y, bool release);
 };
 
-#endif // TESTSCENE2_H
+#endif // TESTSCENE_H

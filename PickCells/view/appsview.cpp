@@ -15,11 +15,11 @@ AppsView::AppsView(QWidget *parent) : QGraphicsView(parent) {
     connect(&_test_scene1, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
 
     connect(&_test_scene2, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
-    _app_mapping["test_scene1"] = &_test_scene1;
-    _app_mapping["test_scene2"] = &_test_scene2;
+    _app_mapping["test_scene"] = &_test_scene1;
+    _app_mapping["color_scene"] = &_test_scene2;
 
-    _configuration_mapping[QPair<QString, QString>("conf_test1","")] = "";
-    _configuration_mapping[QPair<QString, QString>("conf_test2","")] = "";
+    _configuration_mapping[QPair<QString, QString>("app_test","")] = "";
+    _configuration_mapping[QPair<QString, QString>("app_color","")] = "";
 }
 
 AppsView::~AppsView() {
@@ -178,7 +178,10 @@ void AppsView::handle_new_configuration(QString configuration) {
 }
 
 void AppsView::updateMouseEvent(QMouseEvent *event, bool release) {
-    QList<QRectF> rect_to_update = _cur_scene->handleEvent(event->x(), event->y(), release);
+    QList<QRectF> rect_to_update;
+    if (_cur_scene) {
+        rect_to_update = _cur_scene->handleEvent(event->x(), event->y(), release);
+    }
 
     bool ptr_in = _mouse_ptr->isVisible();
     if (ptr_in) { _mouse_ptr->hide(); }

@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->debug_button,SIGNAL(clicked(bool)),this,SLOT(handle_debug_button(bool)));
-    connect(ui->debug_conf,SIGNAL(currentIndexChanged(int)),this,SLOT(handle_debug_conf_button(int)));
+    connect(ui->appli,SIGNAL(currentIndexChanged(int)),this,SLOT(handle_debug_conf_button(int)));
     connect(ui->image_button,SIGNAL(clicked(bool)),this,SLOT(handle_image_button(bool)));
 
     CellsStates *states = CellsStates::getInstance();
@@ -72,7 +72,7 @@ void MainWindow::handle_debug_button(bool checked) {
 
 void MainWindow::handle_debug_conf_button(int ind) {
     CellsStates *states = CellsStates::getInstance();
-    states->setDebugConf(ind);
+    states->setApplication(ind);
 }
 
 void MainWindow::handle_image_button(bool checked) {

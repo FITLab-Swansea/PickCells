@@ -1,9 +1,9 @@
-#include "testscene2.h"
+#include "colorscene.h"
 
-TestScene2::TestScene2() : Scene() {
+ColorScene::ColorScene() : Scene() {
 }
 
-void TestScene2::initializeScene(int brick_size) {
+void ColorScene::initializeScene(int brick_size) {
     deleteWidgets();
 
     // button on 1,3 and 6,2
@@ -25,7 +25,7 @@ void TestScene2::initializeScene(int brick_size) {
     button_list.append(t_but);
 }
 
-QList<QRectF> TestScene2::handleEvent(int x, int y, bool release) {
+QList<QRectF> ColorScene::handleEvent(int x, int y, bool release) {
     QList<QRectF> to_update;
     bool but_active = false;
     for (int k = 0; k < button_list.size(); k++) {
