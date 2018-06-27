@@ -220,7 +220,7 @@ public class CommunicationModule {
         } else if (side.contains("2")) {
             side = ""+new_south;
         } else if (side.contains("3")) {
-            side = ""+new_west;
+            side = ""+new_south;
         }
         return side;
     }
