@@ -24,6 +24,13 @@ enum ColorDimension {
     Value      = 3
 };
 
+enum Reach {
+    Not        = 0,
+    Horizontal = 1,
+    Vertical   = 2,
+    BothDir    = 3
+};
+
 class Swatch : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -68,6 +75,8 @@ public:
     QPair<int, int> swatche_pos;
 
     QColor background;
+
+    Reach reachable;
 
 private:
     int width;

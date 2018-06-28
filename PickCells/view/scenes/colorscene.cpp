@@ -120,22 +120,53 @@ void ColorScene::handle_configuration() {
                     qDebug() << "master " << cur_master << " " << x << " " << y;
                     swatches[cur_master]->processed = true;
 
+                    for (int k = 0; k < masters_and_autos[device].length(); k++) {
+                        swatches[masters_and_autos[device][k]]->reachable = Reach::Not;
+                    }
+                    QList<QString> to_reach;
+                    swatches[cur_master]->reachable = Reach::BothDir;
+                    to_reach.append(cur_master);
+                    while (to_reach.length()) {
+                        QString cur = to_reach.first();
+                        to_reach.pop_front();
+                        for (int k = 0; k < masters_and_autos[device].length(); k++) {
+                            if (swatches[masters_and_autos[device][k]]->reachable == Reach::Not) {
+                                if ((swatches[cur]->reachable == Reach::BothDir) || (swatches[cur]->reachable == Reach::Horizontal)) {
+                                    if ((1 == abs(swatches[cur]->swatche_pos.first - swatches[masters_and_autos[device][k]]->swatche_pos.first))
+                                            && (0 == abs(swatches[cur]->swatche_pos.second - swatches[masters_and_autos[device][k]]->swatche_pos.second))) {
+                                        swatches[masters_and_autos[device][k]]->reachable = Reach::Horizontal;
+                                        to_reach.append(masters_and_autos[device][k]);
+                                    }
+                                }
+                                if ((swatches[cur]->reachable == Reach::BothDir) || (swatches[cur]->reachable == Reach::Vertical)) {
+                                    if ((1 == abs(swatches[cur]->swatche_pos.second - swatches[masters_and_autos[device][k]]->swatche_pos.second))
+                                            && (0 == abs(swatches[cur]->swatche_pos.first - swatches[masters_and_autos[device][k]]->swatche_pos.first))) {
+                                        swatches[masters_and_autos[device][k]]->reachable = Reach::Vertical;
+                                        to_reach.append(masters_and_autos[device][k]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // top
                     QString top_swatch = "";
                     int top_y = -9999;
                     int min_y = y;
                     for (int k = 0; k < masters_and_autos[device].length(); k++) {
-                        int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
-                        int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
-                        if ((_x == x) && (_y < y)) {
-                            if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
-                                if (_y > top_y) {
-                                    top_y = _y;
-                                    top_swatch = masters_and_autos[device][k];
+                        if (swatches[masters_and_autos[device][k]]->reachable != Reach::Not) {
+                            int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
+                            int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
+                            if ((_x == x) && (_y < y)) {
+                                if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
+                                    if (_y > top_y) {
+                                        top_y = _y;
+                                        top_swatch = masters_and_autos[device][k];
+                                    }
                                 }
-                            }
-                            if (_y < min_y) {
-                                min_y = _y;
+                                if (_y < min_y) {
+                                    min_y = _y;
+                                }
                             }
                         }
                     }
@@ -148,17 +179,19 @@ void ColorScene::handle_configuration() {
                     int bot_y = 9999;
                     int max_y = y;
                     for (int k = 0; k < masters_and_autos[device].length(); k++) {
-                        int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
-                        int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
-                        if ((_x == x) && (_y > y)) {
-                            if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
-                                if (_y < bot_y) {
-                                    bot_y = _y;
-                                    bot_swatch = masters_and_autos[device][k];
+                        if (swatches[masters_and_autos[device][k]]->reachable != Reach::Not) {
+                            int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
+                            int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
+                            if ((_x == x) && (_y > y)) {
+                                if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
+                                    if (_y < bot_y) {
+                                        bot_y = _y;
+                                        bot_swatch = masters_and_autos[device][k];
+                                    }
                                 }
-                            }
-                            if (_y > max_y) {
-                                max_y = _y;
+                                if (_y > max_y) {
+                                    max_y = _y;
+                                }
                             }
                         }
                     }
@@ -169,68 +202,68 @@ void ColorScene::handle_configuration() {
                     // set auto only one master
                     if ((bot_swatch == QString("")) && (top_swatch == QString(""))) {
                         for (int k = 0; k < to_process_autos.length(); k++) {
-                            int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                            int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                            if (!swatches[to_process_autos[k]]->processed && (_x == x)) {
-//                                if (!swatches[to_process_autos[k]]->processed) {
+                            if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                if (!swatches[to_process_autos[k]]->processed && (_x == x)) {
                                     new_masters.append(to_process_autos[k]);
-//                                }
-                                swatches[to_process_autos[k]]->processed = true;
-                                qreal h_m, s_m, v_m;
-                                swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                    swatches[to_process_autos[k]]->processed = true;
+                                    qreal h_m, s_m, v_m;
+                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
 
-                                float ratio = 1.0 / (max_y - min_y + 1);
-                                QColor col;
-                                qreal h = h_m - ratio*(y - _y);
-                                h = (h>1?h-1.0:h);
-                                h = (h<0?h+1.0:h);
-                                qreal s = s_m;
-                                qreal v = v_m;
-                                col.setHsvF(h,s,v);
-                                swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                    float ratio = 1.0 / (max_y - min_y + 1);
+                                    QColor col;
+                                    qreal h = h_m - ratio*(y - _y);
+                                    h = (h>1?h-1.0:h);
+                                    h = (h<0?h+1.0:h);
+                                    qreal s = s_m;
+                                    qreal v = v_m;
+                                    col.setHsvF(h,s,v);
+                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                qDebug() << "      set auto only one master";
-                                qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                qDebug() << "          ratio " << ratio;
-                                qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    qDebug() << "      set auto only one master";
+                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                    qDebug() << "          ratio " << ratio;
+                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                }
                             }
                         }
                     } else {
                         // set auto above master -- when below
                         if ((top_swatch == QString("")) && (bot_swatch != QString(""))) {
                             for (int k = 0; k < to_process_autos.length(); k++) {
-                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                                if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y < y) /*&& (_y > top_y)*/) {
-//                                    if (!swatches[to_process_autos[k]]->processed) {
+                                if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                    int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                    int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                    if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y < y) /*&& (_y > top_y)*/) {
                                         new_masters.append(to_process_autos[k]);
-//                                    }
-                                    swatches[to_process_autos[k]]->processed = true;
-                                    qreal h_m, s_m, v_m;
-                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
-                                    qreal h_t, s_t, v_t;
-                                    swatches[bot_swatch]->background.getHsvF(&h_t, &s_t, &v_t);
-                                    int top_y = min_y - 1;
+                                        swatches[to_process_autos[k]]->processed = true;
+                                        qreal h_m, s_m, v_m;
+                                        swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                        qreal h_t, s_t, v_t;
+                                        swatches[bot_swatch]->background.getHsvF(&h_t, &s_t, &v_t);
+                                        int top_y = min_y - 1;
 
-                                    float ratio = ((float)(top_y - _y)) / ((float)(top_y - y));
+                                        float ratio = ((float)(top_y - _y)) / ((float)(top_y - y));
 
-                                    QColor col;
-                                    h_t = (h_t>h_m?h_t-1.0:h_t);
-                                    qreal h = h_t + ratio*(h_m - h_t);
-                                    h = (h>1?h-1.0:h);
-                                    h = (h<0?h+1.0:h);
-                                    qreal s = min(s_m,s_t) + ratio*(max(s_m,s_t) - min(s_m,s_t));
-                                    qreal v = min(v_m,s_t) + ratio*(max(v_m,v_t) - min(v_m,v_t));
-                                    col.setHsvF(h,s,v);
-                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                        QColor col;
+                                        h_t = (h_t>h_m?h_t-1.0:h_t);
+                                        qreal h = h_t + ratio*(h_m - h_t);
+                                        h = (h>1?h-1.0:h);
+                                        h = (h<0?h+1.0:h);
+                                        qreal s = min(s_m,s_t) + ratio*(max(s_m,s_t) - min(s_m,s_t));
+                                        qreal v = min(v_m,s_t) + ratio*(max(v_m,v_t) - min(v_m,v_t));
+                                        col.setHsvF(h,s,v);
+                                        swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto above master -- when below";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        qDebug() << "      set auto above master -- when below";
+                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        qDebug() << "          ratio " << ratio;
+                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
+                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    }
                                 }
                             }
                         }
@@ -238,37 +271,37 @@ void ColorScene::handle_configuration() {
                         // set auto below master -- when above
                         if ((bot_swatch == QString("")) && (top_swatch != QString(""))) {
                             for (int k = 0; k < to_process_autos.length(); k++) {
-                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                                if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y > y) /*&& (_y < bot_y)*/) {
-//                                    if (!swatches[to_process_autos[k]]->processed) {
+                                if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                    int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                    int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                    if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y > y) /*&& (_y < bot_y)*/) {
                                         new_masters.append(to_process_autos[k]);
-//                                    }
-                                    swatches[to_process_autos[k]]->processed = true;
-                                    qreal h_m, s_m, v_m;
-                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
-                                    qreal h_b, s_b, v_b;
-                                    swatches[top_swatch]->background.getHsvF(&h_b, &s_b, &v_b);
-                                    int bot_y = max_y + 1;
+                                        swatches[to_process_autos[k]]->processed = true;
+                                        qreal h_m, s_m, v_m;
+                                        swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                        qreal h_b, s_b, v_b;
+                                        swatches[top_swatch]->background.getHsvF(&h_b, &s_b, &v_b);
+                                        int bot_y = max_y + 1;
 
-                                    float ratio = ((float)(y - _y)) / ((float)(y - bot_y));
+                                        float ratio = ((float)(y - _y)) / ((float)(y - bot_y));
 
-                                    QColor col;
-                                    h_b = (h_b<h_m?h_b+1.0:h_b);
-                                    qreal h = h_m + ratio*(h_b - h_m);
-                                    h = (h>1?h-1.0:h);
-                                    h = (h<0?h+1.0:h);
-                                    qreal s = min(s_m,s_b) + ratio*(max(s_m,s_b) - min(s_m,s_b));
-                                    qreal v = min(v_m,s_b) + ratio*(max(v_m,v_b) - min(v_m,v_b));
-                                    col.setHsvF(h,s,v);
-                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                        QColor col;
+                                        h_b = (h_b<h_m?h_b+1.0:h_b);
+                                        qreal h = h_m + ratio*(h_b - h_m);
+                                        h = (h>1?h-1.0:h);
+                                        h = (h<0?h+1.0:h);
+                                        qreal s = min(s_m,s_b) + ratio*(max(s_m,s_b) - min(s_m,s_b));
+                                        qreal v = min(v_m,s_b) + ratio*(max(v_m,v_b) - min(v_m,v_b));
+                                        col.setHsvF(h,s,v);
+                                        swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto below master -- when above";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        qDebug() << "      set auto below master -- when above";
+                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        qDebug() << "          ratio " << ratio;
+                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
+                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    }
                                 }
                             }
                         }
@@ -276,37 +309,37 @@ void ColorScene::handle_configuration() {
                         // set auto between master -- top
                         if (top_swatch != QString("")) {
                             for (int k = 0; k < to_process_autos.length(); k++) {
-                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                                if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y < y) && (_y > top_y)) {
-//                                    if (!swatches[to_process_autos[k]]->processed) {
+                                if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                    int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                    int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                    if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y < y) && (_y > top_y)) {
                                         new_masters.append(to_process_autos[k]);
-//                                    }
-                                    swatches[to_process_autos[k]]->processed = true;
-                                    qreal h_m, s_m, v_m;
-                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
-                                    qreal h_t, s_t, v_t;
-                                    swatches[top_swatch]->background.getHsvF(&h_t, &s_t, &v_t);
-                                    int top_y = swatches[top_swatch]->swatche_pos.second;
+                                        swatches[to_process_autos[k]]->processed = true;
+                                        qreal h_m, s_m, v_m;
+                                        swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                        qreal h_t, s_t, v_t;
+                                        swatches[top_swatch]->background.getHsvF(&h_t, &s_t, &v_t);
+                                        int top_y = swatches[top_swatch]->swatche_pos.second;
 
-                                    float ratio = ((float)(top_y - _y)) / ((float)(top_y - y));
+                                        float ratio = ((float)(top_y - _y)) / ((float)(top_y - y));
 
-                                    QColor col;
-                                    h_t = (h_t>h_m?h_t-1.0:h_t);
-                                    qreal h = h_t + ratio*(h_m - h_t);
-                                    h = (h>1?h-1.0:h);
-                                    h = (h<0?h+1.0:h);
-                                    qreal s = min(s_m,s_t) + ratio*(max(s_m,s_t) - min(s_m,s_t));
-                                    qreal v = min(v_m,s_t) + ratio*(max(v_m,v_t) - min(v_m,v_t));
-                                    col.setHsvF(h,s,v);
-                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                        QColor col;
+                                        h_t = (h_t>h_m?h_t-1.0:h_t);
+                                        qreal h = h_t + ratio*(h_m - h_t);
+                                        h = (h>1?h-1.0:h);
+                                        h = (h<0?h+1.0:h);
+                                        qreal s = min(s_m,s_t) + ratio*(max(s_m,s_t) - min(s_m,s_t));
+                                        qreal v = min(v_m,s_t) + ratio*(max(v_m,v_t) - min(v_m,v_t));
+                                        col.setHsvF(h,s,v);
+                                        swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto between master -- top";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        qDebug() << "      set auto between master -- top";
+                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        qDebug() << "          ratio " << ratio;
+                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
+                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    }
                                 }
                             }
                         }
@@ -314,37 +347,37 @@ void ColorScene::handle_configuration() {
                         // set auto between master -- bot
                         if (bot_swatch != QString("")) {
                             for (int k = 0; k < to_process_autos.length(); k++) {
-                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                                if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y > y) && (_y < bot_y)) {
-//                                    if (!swatches[to_process_autos[k]]->processed) {
-                                        new_masters.append(to_process_autos[k]);
-//                                    }
-                                    swatches[to_process_autos[k]]->processed = true;
-                                    qreal h_m, s_m, v_m;
-                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
-                                    qreal h_b, s_b, v_b;
-                                    swatches[bot_swatch]->background.getHsvF(&h_b, &s_b, &v_b);
-                                    int bot_y = swatches[bot_swatch]->swatche_pos.second;
+                                if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                    int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                    int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                    if (!swatches[to_process_autos[k]]->processed && (_x == x) && (_y > y) && (_y < bot_y)) {
+                                            new_masters.append(to_process_autos[k]);
+                                        swatches[to_process_autos[k]]->processed = true;
+                                        qreal h_m, s_m, v_m;
+                                        swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                        qreal h_b, s_b, v_b;
+                                        swatches[bot_swatch]->background.getHsvF(&h_b, &s_b, &v_b);
+                                        int bot_y = swatches[bot_swatch]->swatche_pos.second;
 
-                                    float ratio = ((float)(y - _y)) / ((float)(y - bot_y));
+                                        float ratio = ((float)(y - _y)) / ((float)(y - bot_y));
 
-                                    QColor col;
-                                    h_b = (h_b<h_m?h_b+1.0:h_b);
-                                    qreal h = h_m + ratio*(h_b - h_m);
-                                    h = (h>1?h-1.0:h);
-                                    h = (h<0?h+1.0:h);
-                                    qreal s = min(s_m,s_b) + ratio*(max(s_m,s_b) - min(s_m,s_b));
-                                    qreal v = min(v_m,s_b) + ratio*(max(v_m,v_b) - min(v_m,v_b));
-                                    col.setHsvF(h,s,v);
-                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                        QColor col;
+                                        h_b = (h_b<h_m?h_b+1.0:h_b);
+                                        qreal h = h_m + ratio*(h_b - h_m);
+                                        h = (h>1?h-1.0:h);
+                                        h = (h<0?h+1.0:h);
+                                        qreal s = min(s_m,s_b) + ratio*(max(s_m,s_b) - min(s_m,s_b));
+                                        qreal v = min(v_m,s_b) + ratio*(max(v_m,v_b) - min(v_m,v_b));
+                                        col.setHsvF(h,s,v);
+                                        swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto between master -- bot";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        qDebug() << "      set auto between master -- bot";
+                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        qDebug() << "          ratio " << ratio;
+                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
+                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    }
                                 }
                             }
                         }
@@ -362,22 +395,53 @@ void ColorScene::handle_configuration() {
                     qDebug() << "master " << cur_master << " " << x << " " << y;
                     swatches[cur_master]->processed = true;
 
+                    for (int k = 0; k < masters_and_autos[device].length(); k++) {
+                        swatches[masters_and_autos[device][k]]->reachable = Reach::Not;
+                    }
+                    QList<QString> to_reach;
+                    swatches[cur_master]->reachable = Reach::BothDir;
+                    to_reach.append(cur_master);
+                    while (to_reach.length()) {
+                        QString cur = to_reach.first();
+                        to_reach.pop_front();
+                        for (int k = 0; k < masters_and_autos[device].length(); k++) {
+                            if (swatches[masters_and_autos[device][k]]->reachable == Reach::Not) {
+                                if ((swatches[cur]->reachable == Reach::BothDir) || (swatches[cur]->reachable == Reach::Horizontal)) {
+                                    if ((1 == abs(swatches[cur]->swatche_pos.first - swatches[masters_and_autos[device][k]]->swatche_pos.first))
+                                            && (0 == abs(swatches[cur]->swatche_pos.second - swatches[masters_and_autos[device][k]]->swatche_pos.second))) {
+                                        swatches[masters_and_autos[device][k]]->reachable = Reach::Horizontal;
+                                        to_reach.append(masters_and_autos[device][k]);
+                                    }
+                                }
+                                if ((swatches[cur]->reachable == Reach::BothDir) || (swatches[cur]->reachable == Reach::Vertical)) {
+                                    if ((1 == abs(swatches[cur]->swatche_pos.second - swatches[masters_and_autos[device][k]]->swatche_pos.second))
+                                            && (0 == abs(swatches[cur]->swatche_pos.first - swatches[masters_and_autos[device][k]]->swatche_pos.first))) {
+                                        swatches[masters_and_autos[device][k]]->reachable = Reach::Vertical;
+                                        to_reach.append(masters_and_autos[device][k]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // left
                     QString left_swatch = "";
                     int left_x = -9999;
                     int min_x = x;
                     for (int k = 0; k < masters_and_autos[device].length(); k++) {
-                        int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
-                        int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
-                        if ((_y == y) && (_x < x)) {
-                            if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
-                                if (_x > left_x) {
-                                    left_x = _x;
-                                    left_swatch = masters_and_autos[device][k];
+                        if (swatches[masters_and_autos[device][k]]->reachable != Reach::Not) {
+                            int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
+                            int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
+                            if ((_y == y) && (_x < x)) {
+                                if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
+                                    if (_x > left_x) {
+                                        left_x = _x;
+                                        left_swatch = masters_and_autos[device][k];
+                                    }
                                 }
-                            }
-                            if (_x < min_x) {
-                                min_x = _x;
+                                if (_x < min_x) {
+                                    min_x = _x;
+                                }
                             }
                         }
                     }
@@ -390,17 +454,19 @@ void ColorScene::handle_configuration() {
                     int right_x = 9999;
                     int max_x = x;
                     for (int k = 0; k < masters_and_autos[device].length(); k++) {
-                        int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
-                        int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
-                        if ((_y == y) && (_x > x)) {
-                            if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
-                                if (_x < right_x) {
-                                    right_x = _x;
-                                    right_swatch = masters_and_autos[device][k];
+                        if (swatches[masters_and_autos[device][k]]->reachable != Reach::Not) {
+                            int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
+                            int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
+                            if ((_y == y) && (_x > x)) {
+                                if (swatches[masters_and_autos[device][k]]->processed || (swatches[masters_and_autos[device][k]]->swatche_state == SwatchState::Master)) {
+                                    if (_x < right_x) {
+                                        right_x = _x;
+                                        right_swatch = masters_and_autos[device][k];
+                                    }
                                 }
-                            }
-                            if (_x > max_x) {
-                                max_x = _x;
+                                if (_x > max_x) {
+                                    max_x = _x;
+                                }
                             }
                         }
                     }
@@ -412,36 +478,36 @@ void ColorScene::handle_configuration() {
                     // set auto between master -- left
                     if (left_swatch != QString("")) {
                         for (int k = 0; k < to_process_autos.length(); k++) {
-                            int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                            int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                            if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x < x) && (_x > left_x)) {
-//                                if (!swatches[to_process_autos[k]]->processed) {
+                            if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x < x) && (_x > left_x)) {
                                     new_masters.append(to_process_autos[k]);
-//                                }
-                                swatches[to_process_autos[k]]->processed = true;
-                                qreal h_m, s_m, v_m;
-                                swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
-                                qreal h_l, s_l, v_l;
-                                swatches[left_swatch]->background.getHsvF(&h_l, &s_l, &v_l);
+                                    swatches[to_process_autos[k]]->processed = true;
+                                    qreal h_m, s_m, v_m;
+                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                    qreal h_l, s_l, v_l;
+                                    swatches[left_swatch]->background.getHsvF(&h_l, &s_l, &v_l);
 
-                                float ratio = ((float)(left_x - _x)) / ((float)(left_x - x));
+                                    float ratio = ((float)(left_x - _x)) / ((float)(left_x - x));
 
-                                QColor col;
-                                v_l = (v_l>v_m?v_l-1.0:v_l);
-                                qreal v = v_l + ratio*(v_m - v_l);
-                                v = (v>1?v-1.0:v);
-                                v = (v<0?v+1.0:v);
-                                qreal s = min(s_m,s_l) + ratio*(max(s_m,s_l) - min(s_m,s_l));
-                                qreal h = min(h_m,h_l) + ratio*(max(h_m,h_l) - min(h_m,h_l));
-                                col.setHsvF(h,s,v);
-                                swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                    QColor col;
+                                    v_l = (v_l>v_m?v_l-1.0:v_l);
+                                    qreal v = v_l + ratio*(v_m - v_l);
+                                    v = (v>1?v-1.0:v);
+                                    v = (v<0?v+1.0:v);
+                                    qreal s = min(s_m,s_l) + ratio*(max(s_m,s_l) - min(s_m,s_l));
+                                    qreal h = min(h_m,h_l) + ratio*(max(h_m,h_l) - min(h_m,h_l));
+                                    col.setHsvF(h,s,v);
+                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                qDebug() << "      set auto between master -- left";
-                                qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                qDebug() << "          ratio " << ratio;
-                                qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                qDebug() << "          hsv l " << h_l << " " << s_l << " " << v_l;
-                                qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    qDebug() << "      set auto between master -- left";
+                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    qDebug() << "          ratio " << ratio;
+                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    qDebug() << "          hsv l " << h_l << " " << s_l << " " << v_l;
+                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                }
                             }
                         }
                     }
@@ -449,37 +515,37 @@ void ColorScene::handle_configuration() {
                     // set auto between master -- right
                     if (right_swatch != QString("")) {
                         for (int k = 0; k < to_process_autos.length(); k++) {
-                            int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                            int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                            if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x > x) && (_x < right_x)) {
-//                                if (!swatches[to_process_autos[k]]->processed) {
+                            if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x > x) && (_x < right_x)) {
                                     new_masters.append(to_process_autos[k]);
-//                                }
-                                swatches[to_process_autos[k]]->processed = true;
-                                qreal h_m, s_m, v_m;
-                                swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
-                                qreal h_r, s_r, v_r;
-                                swatches[right_swatch]->background.getHsvF(&h_r, &s_r, &v_r);
+                                    swatches[to_process_autos[k]]->processed = true;
+                                    qreal h_m, s_m, v_m;
+                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                    qreal h_r, s_r, v_r;
+                                    swatches[right_swatch]->background.getHsvF(&h_r, &s_r, &v_r);
 
-                                qDebug() << x << " -- " << _x << " -- " << right_x;
-                                float ratio = ((float)(x - _x)) / ((float)(x - right_x));
+                                    qDebug() << x << " -- " << _x << " -- " << right_x;
+                                    float ratio = ((float)(x - _x)) / ((float)(x - right_x));
 
-                                QColor col;
-                                v_r = (v_r<v_m?v_r+1.0:v_r);
-                                qreal v = v_m + ratio*(v_r - v_m);
-                                v = (v>1?v-1.0:v);
-                                v = (v<0?v+1.0:v);
-                                qreal s = min(s_m,s_r) + ratio*(max(s_m,s_r) - min(s_m,s_r));
-                                qreal h = min(h_m,h_r) + ratio*(max(h_m,h_r) - min(h_m,h_r));
-                                col.setHsvF(h,s,v);
-                                swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                    QColor col;
+                                    v_r = (v_r<v_m?v_r+1.0:v_r);
+                                    qreal v = v_m + ratio*(v_r - v_m);
+                                    v = (v>1?v-1.0:v);
+                                    v = (v<0?v+1.0:v);
+                                    qreal s = min(s_m,s_r) + ratio*(max(s_m,s_r) - min(s_m,s_r));
+                                    qreal h = min(h_m,h_r) + ratio*(max(h_m,h_r) - min(h_m,h_r));
+                                    col.setHsvF(h,s,v);
+                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                qDebug() << "      set auto between master -- right";
-                                qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                qDebug() << "          ratio " << ratio;
-                                qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                qDebug() << "          hsv r " << h_r << " " << s_r << " " << v_r;
-                                qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    qDebug() << "      set auto between master -- right";
+                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    qDebug() << "          ratio " << ratio;
+                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    qDebug() << "          hsv r " << h_r << " " << s_r << " " << v_r;
+                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                }
                             }
                         }
                     }
@@ -487,30 +553,30 @@ void ColorScene::handle_configuration() {
                     // set auto no master -- left
                     if (left_swatch == QString("")) {
                         for (int k = 0; k < to_process_autos.length(); k++) {
-                            int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                            int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                            if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x < x)) {
-//                                if (!swatches[to_process_autos[k]]->processed) {
+                            if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x < x)) {
                                     new_masters.append(to_process_autos[k]);
-//                                }
-                                swatches[to_process_autos[k]]->processed = true;
-                                qreal h_m, s_m, v_m;
-                                swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                    swatches[to_process_autos[k]]->processed = true;
+                                    qreal h_m, s_m, v_m;
+                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
 
-                                float ratio = ((float)(min_x - _x)) / ((float)(min_x - x));
+                                    float ratio = ((float)(min_x - _x)) / ((float)(min_x - x));
 
-                                QColor col;
-                                qreal v = ratio*v_m;
-                                qreal s = s_m;
-                                qreal h = h_m;
-                                col.setHsvF(h,s,v);
-                                swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                    QColor col;
+                                    qreal v = ratio*v_m;
+                                    qreal s = s_m;
+                                    qreal h = h_m;
+                                    col.setHsvF(h,s,v);
+                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                qDebug() << "      set auto no master -- left";
-                                qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                qDebug() << "          ratio " << ratio;
-                                qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    qDebug() << "      set auto no master -- left";
+                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    qDebug() << "          ratio " << ratio;
+                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                }
                             }
                         }
                     }
@@ -518,30 +584,30 @@ void ColorScene::handle_configuration() {
                     // set auto no master -- right
                     if (right_swatch == QString("")) {
                         for (int k = 0; k < to_process_autos.length(); k++) {
-                            int _x = swatches[to_process_autos[k]]->swatche_pos.first;
-                            int _y = swatches[to_process_autos[k]]->swatche_pos.second;
-                            if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x > x)) {
-//                                if (!swatches[to_process_autos[k]]->processed) {
+                            if (swatches[to_process_autos[k]]->reachable != Reach::Not) {
+                                int _x = swatches[to_process_autos[k]]->swatche_pos.first;
+                                int _y = swatches[to_process_autos[k]]->swatche_pos.second;
+                                if (!swatches[to_process_autos[k]]->processed && (_y == y) && (_x > x)) {
                                     new_masters.append(to_process_autos[k]);
-//                                }
-                                swatches[to_process_autos[k]]->processed = true;
-                                qreal h_m, s_m, v_m;
-                                swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
+                                    swatches[to_process_autos[k]]->processed = true;
+                                    qreal h_m, s_m, v_m;
+                                    swatches[cur_master]->background.getHsvF(&h_m, &s_m, &v_m);
 
-                                float ratio = ((float)(_x - max_x)) / ((float)(x - max_x));
+                                    float ratio = ((float)(_x - max_x)) / ((float)(x - max_x));
 
-                                QColor col;
-                                qreal v = v_m + (1.0-ratio)*(1.0-v_m);
-                                qreal s = s_m;
-                                qreal h = h_m;
-                                col.setHsvF(h,s,v);
-                                swatches[to_process_autos[k]]->setColorBackground(col,col);
+                                    QColor col;
+                                    qreal v = v_m + (1.0-ratio)*(1.0-v_m);
+                                    qreal s = s_m;
+                                    qreal h = h_m;
+                                    col.setHsvF(h,s,v);
+                                    swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                qDebug() << "      set auto no master -- right";
-                                qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                qDebug() << "          ratio " << ratio;
-                                qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    qDebug() << "      set auto no master -- right";
+                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    qDebug() << "          ratio " << ratio;
+                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                }
                             }
                         }
                     }
