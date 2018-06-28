@@ -636,6 +636,7 @@ void ColorScene::handle_action(QString action) {
                 swatches[act_id[1]]->setColorBackground(QColor("#2F3E4E"), swatches[act_id[1]]->background);
             }
             handle_configuration();
+            emit need_general_update();
         } else {
             if (act_id[0] == QString("tap")) {
 //                if (swatches[act_id[1]]->swatche_state == SwatchState::Master) {

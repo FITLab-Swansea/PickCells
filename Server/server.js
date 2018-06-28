@@ -482,37 +482,37 @@ datelog('Server for Qt started at: ' + ADDRESS + ':' + PORT);
 //             ],
 //   'watches': ['111', '222', '333', '444', '555', '666', '777', '888']
 // };
-configuration = {
-  'devices':[{
-                'min_x':0, 'max_x': 0, 'min_y':-1, 'max_y':2, 'min_z':0, 'max_z':0,
-                'connections': {
-                                  '555': {'x':0, 'y':-1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':'666', 'E':null, 'W':null},
-                                  '666': {'x':0, 'y': 0, 'z':0, 'B':null, 'T':null, 'N':'555', 'S':'888', 'E':null, 'W':null},
-                                  '888': {'x':0, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':'666', 'S':'777', 'E':null, 'W':null},
-                                  '777': {'x':0, 'y': 2, 'z':0, 'B':null, 'T':null, 'N':'888', 'S':null, 'E':null, 'W':null}
-                               }
-             },
-             {
-                'min_x':-2, 'max_x': 1, 'min_y':0, 'max_y':0, 'min_z':0, 'max_z':0,
-                'connections': {
-                                  '111': {'x':-2, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'222', 'W':null},
-                                  '222': {'x':-1, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'333', 'W':'111'},
-                                  '333': {'x': 0, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'444', 'W':'222'},
-                                  '444': {'x': 1, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':null, 'W':'333'}
-                               }
-             },
-             {
-                'min_x':-1, 'max_x': 1, 'min_y':-1, 'max_y':1, 'min_z':0, 'max_z':0,
-                'connections': {
-                                  '011': {'x':-1, 'y':-1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':'033', 'E':'022', 'W':null},
-                                  '022': {'x': 0, 'y':-1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':null, 'W':'011'},
-                                  '033': {'x':-1, 'y': 0, 'z':0, 'B':null, 'T':null, 'N':'011', 'S':'044', 'E':null, 'W':null},
-                                  '044': {'x':-1, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':'033', 'S':null, 'E':'055', 'W':null},
-                                  '055': {'x': 0, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'066', 'W':'044'},
-                                  '066': {'x': 1, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'055', 'W':null}
-                               }
-             }
-            ],
-  'watches': ['111', '222', '333', '444', '555', '666', '777', '888', '011', '022', '033', '044', '055', '066']
-};
-print_configuration();
+// configuration = {
+//   'devices':[{
+//                 'min_x':0, 'max_x': 0, 'min_y':-1, 'max_y':2, 'min_z':0, 'max_z':0,
+//                 'connections': {
+//                                   '555': {'x':0, 'y':-1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':'666', 'E':null, 'W':null},
+//                                   '666': {'x':0, 'y': 0, 'z':0, 'B':null, 'T':null, 'N':'555', 'S':'888', 'E':null, 'W':null},
+//                                   '888': {'x':0, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':'666', 'S':'777', 'E':null, 'W':null},
+//                                   '777': {'x':0, 'y': 2, 'z':0, 'B':null, 'T':null, 'N':'888', 'S':null, 'E':null, 'W':null}
+//                                }
+//              },
+//              {
+//                 'min_x':-2, 'max_x': 1, 'min_y':0, 'max_y':0, 'min_z':0, 'max_z':0,
+//                 'connections': {
+//                                   '111': {'x':-2, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'222', 'W':null},
+//                                   '222': {'x':-1, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'333', 'W':'111'},
+//                                   '333': {'x': 0, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'444', 'W':'222'},
+//                                   '444': {'x': 1, 'y':0, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':null, 'W':'333'}
+//                                }
+//              },
+//              {
+//                 'min_x':-1, 'max_x': 1, 'min_y':-1, 'max_y':1, 'min_z':0, 'max_z':0,
+//                 'connections': {
+//                                   '011': {'x':-1, 'y':-1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':'033', 'E':'022', 'W':null},
+//                                   '022': {'x': 0, 'y':-1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':null, 'W':'011'},
+//                                   '033': {'x':-1, 'y': 0, 'z':0, 'B':null, 'T':null, 'N':'011', 'S':'044', 'E':null, 'W':null},
+//                                   '044': {'x':-1, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':'033', 'S':null, 'E':'055', 'W':null},
+//                                   '055': {'x': 0, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'066', 'W':'044'},
+//                                   '066': {'x': 1, 'y': 1, 'z':0, 'B':null, 'T':null, 'N':null, 'S':null, 'E':'055', 'W':null}
+//                                }
+//              }
+//             ],
+//   'watches': ['111', '222', '333', '444', '555', '666', '777', '888', '011', '022', '033', '044', '055', '066']
+// };
+// print_configuration();

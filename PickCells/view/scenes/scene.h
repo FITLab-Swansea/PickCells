@@ -55,6 +55,7 @@ public:
 
 signals:
     void action(QString);
+    void need_general_update();
 
 protected:
     bool is_set;

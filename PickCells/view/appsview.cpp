@@ -189,6 +189,7 @@ void AppsView::handle_actions(QString action) {
         } else {
             //qDebug() << "Error action!" << action << "does not exist";
             _cur_scene->handle_action(action);
+            handle_general_update();
         }
     }
 }
