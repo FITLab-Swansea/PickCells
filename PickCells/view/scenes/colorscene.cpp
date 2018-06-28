@@ -16,16 +16,16 @@ void ColorScene::unsetWidgets(QGraphicsScene *scene) {
 }
 
 void ColorScene::setSwatches() {
-    QList<QString> swatches_id = swatch_states.keys();
+    QList<QString> swatches_id = swatches.keys();
     for (int k = 0; k < swatches_id.length(); k++) {
-        if (swatches_visible[swatches_id[k]]) {
+        if (swatches[swatches_id[k]]->swatche_visible) {
             _scene->addItem(swatches[swatches_id[k]]);
         }
     }
 }
 
 void ColorScene::unsetSwatches() {
-    QList<QString> swatches_id = swatch_states.keys();
+    QList<QString> swatches_id = swatches.keys();
     for (int k = 0; k < swatches_id.length(); k++) {
         _scene->removeItem(swatches[swatches_id[k]]);
     }
@@ -36,9 +36,9 @@ void ColorScene::handle_configuration() {
     qDebug() << "vamos a manejar el conf";
 
     unsetSwatches();
-    QList<QString> swatches_id = swatch_states.keys();
+    QList<QString> swatches_id = swatches.keys();
     for (int k = 0; k < swatches_id.length(); k++) {
-        swatches_visible[swatches_id[k]] = false;
+        swatches[swatches_id[k]]->swatche_visible = false;
     }
 
     CellsStates *states = CellsStates::getInstance();
@@ -50,20 +50,20 @@ void ColorScene::handle_configuration() {
                 for (int layer = states->getDeviceDepth(device)-1; layer >=0; layer--) {
                     Cell *c = states->getCell(device, layer, row, col);
                     if (c != NULL) {
-                        if (swatch_states.contains(c->getCellId())) {
+                        if (swatches.contains(c->getCellId())) {
                             swatches[c->getCellId()]->initializeSize(_brick_size, _brick_size);
                         } else {
-                            swatch_states[c->getCellId()] = SwatchState::Auto;
                             Swatch *swt = new Swatch(NULL, _brick_size, _brick_size);
                             swt->setZValue(5);
                             swatches[c->getCellId()] = swt;
+                            swatches[c->getCellId()]->swatche_state = SwatchState::Auto;
                             swatches[c->getCellId()]->setColorBackground(QColor("#37495C"), QColor("#2F3E4E"));
                         }
 
                         swatches[c->getCellId()]->setPos((col+offset)*_brick_size, (row+1)*_brick_size);
-                        swatches[c->getCellId()]->setAction("randcolor:"+c->getCellId());
+                        swatches[c->getCellId()]->setAction("tap:"+c->getCellId());
                         swatches[c->getCellId()]->setLongAction("master:"+c->getCellId());
-                        swatches_visible[c->getCellId()] = true;
+                        swatches[c->getCellId()]->swatche_visible = true;
                         swatches[c->getCellId()]->update();
                         break;
                     }
@@ -81,22 +81,22 @@ void ColorScene::handle_action(QString action) {
     QList<QString> act_id = action.split(':');
     if (act_id.length() == 2) {
         if (act_id[0] == QString("master")) {
-            if (swatch_states[act_id[1]] == SwatchState::Auto) {
-                swatch_states[act_id[1]] = SwatchState::Master;
+            if (swatches[act_id[1]]->swatche_state == SwatchState::Auto) {
+                swatches[act_id[1]]->swatche_state = SwatchState::Master;
                 swatches[act_id[1]]->setColorBackground(QColor("#99495C"), QColor("#2F3E4E"));
             } else {
-                swatch_states[act_id[1]] = SwatchState::Auto;
+                swatches[act_id[1]]->swatche_state = SwatchState::Auto;
                 swatches[act_id[1]]->setColorBackground(QColor("#37495C"), QColor("#2F3E4E"));
             }
         } else {
-            if (act_id[0] == QString("randcolor")) {
-                if (swatch_states[act_id[1]] == SwatchState::Master) {
-                    QColor rand_col;
-                    rand_col.setRed(rand() % 256);
-                    rand_col.setGreen(rand() % 256);
-                    rand_col.setBlue(rand() % 256);
-                    swatches[act_id[1]]->setColorBackground(QColor("#99495C"), rand_col);
-                }
+            if (act_id[0] == QString("tap")) {
+//                if (swatches[act_id[1]]->swatche_state == SwatchState::Master) {
+//                    QColor rand_col;
+//                    rand_col.setRed(rand() % 256);
+//                    rand_col.setGreen(rand() % 256);
+//                    rand_col.setBlue(rand() % 256);
+//                    swatches[act_id[1]]->setColorBackground(QColor("#99495C"), rand_col);
+//                }
             }
         }
     }
@@ -118,6 +118,8 @@ void ColorScene::initializeScene(int brick_size) {
     button_list.append(ref_but);
 
     _brick_size = brick_size;
+
+    handle_configuration();
 }
 
 QList<QRectF> ColorScene::handleEvent(int x, int y, bool release) {
@@ -155,32 +157,42 @@ QList<QRectF> ColorScene::handleEvent(int x, int y, bool release) {
     }
 
     bool swatch_active = false;
-    QList<QString> swatches_id = swatch_states.keys();
+    QList<QString> swatches_id = swatches.keys();
     for (int k = 0; k < swatches_id.length(); k++) {
-        if (swatches_visible[swatches_id[k]] && swatches[swatches_id[k]]->isActive()) {
+        if (swatches[swatches_id[k]]->swatche_visible && swatches[swatches_id[k]]->isActive()) {
+            QRectF bbox(swatches[swatches_id[k]]->x(),
+                        swatches[swatches_id[k]]->y(),
+                        swatches[swatches_id[k]]->boundingRect().width(),
+                        swatches[swatches_id[k]]->boundingRect().height());
             if (release) {
                 swatches[swatches_id[k]]->setActive(false);
-                QRectF bbox(swatches[swatches_id[k]]->x(),
-                            swatches[swatches_id[k]]->y(),
-                            swatches[swatches_id[k]]->boundingRect().width(),
-                            swatches[swatches_id[k]]->boundingRect().height());
                 if (bbox.contains(x,y)) {
                     int elapse_time = swatches[swatches_id[k]]->getTime();
                     qDebug() << elapse_time;
-                    if (elapse_time < 1000) {
-                        emit action(swatches[swatches_id[k]]->getAction());
-                    } else {
-                        emit action(swatches[swatches_id[k]]->getLongAction());
+                    //if (elapse_time < 500) {
+                    //    emit action(swatches[swatches_id[k]]->getAction());
+                    //} else {
+                    //    emit action(swatches[swatches_id[k]]->getLongAction());
+                    //}
+                    if (elapse_time >= 500) {
+                        if (!swatches[swatches_id[k]]->getColorChanged()) {
+                            emit action(swatches[swatches_id[k]]->getLongAction());
+                        }
                     }
                 }
                 to_update.append(bbox);
                 break;
+            } else if (swatches[swatches_id[k]]->swatche_state == SwatchState::Master) {
+                if (swatches[swatches_id[k]]->getColorChanged() || swatches[swatches_id[k]]->colorCanChange(x,y)) {
+                    swatches[swatches_id[k]]->changeColor(x,y);
+                    to_update.append(bbox);
+                }
             }
             swatch_active = true;
         }
     }
     if (!swatch_active && !release) {
-        QList<QString> swatches_id = swatch_states.keys();
+        QList<QString> swatches_id = swatches.keys();
         for (int k = 0; k < swatches_id.length(); k++) {
             QRectF bbox(swatches[swatches_id[k]]->x(),
                         swatches[swatches_id[k]]->y(),
@@ -189,6 +201,8 @@ QList<QRectF> ColorScene::handleEvent(int x, int y, bool release) {
             if (bbox.contains(x,y)) {
                 swatches[swatches_id[k]]->setActive(true);
                 swatches[swatches_id[k]]->startTime();
+                swatches[swatches_id[k]]->setInitialXY(x,y);
+                swatches[swatches_id[k]]->setColorChanged(false);
                 to_update.append(bbox);
                 break;
             }

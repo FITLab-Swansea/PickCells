@@ -12,6 +12,18 @@
 #include <iostream>
 using namespace std;
 
+enum SwatchState {
+    Auto       = 0,
+    Master     = 1
+};
+
+enum ColorDimension {
+    None       = 0,
+    Hue        = 1,
+    Saturation = 2,
+    Value      = 3
+};
+
 class Swatch : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -39,6 +51,18 @@ public:
     int getTime() { return timer.elapsed(); }
     void startTime() { timer.restart(); }
 
+    void setColorChanged(bool val) { color_changed = val; }
+    bool getColorChanged() { return color_changed; }
+    bool colorCanChange(int x, int y);
+    void setInitialXY(int x, int y);
+    int getDx(int x) { return x - _init_x; }
+    int getDy(int y) { return y - _init_y; }
+
+    void changeColor(int x, int y);
+
+    bool swatche_visible;
+    SwatchState swatche_state;
+
 private:
     int width;
     int height;
@@ -54,7 +78,12 @@ private:
     QString action;
     QString long_action;
 
+    bool color_changed;
     QTime timer;
+    int _init_x;
+    int _init_y;
+    QColor init_background;
+    ColorDimension cur_dimension;
 };
 
 #endif // SWATCH_H

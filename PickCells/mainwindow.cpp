@@ -190,13 +190,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 void MainWindow::handle_debug_button(bool checked) {
     CellsStates *states = CellsStates::getInstance();
     states->setDebug(checked);
-    ui->cells_view->sceneUpdate();
-    ui->app_view->sceneUpdate();
+//    ui->cells_view->sceneUpdate();
+//    ui->app_view->sceneUpdate();
+    ui->app_view->handle_general_update();
 }
 
 void MainWindow::handle_debug_conf_button(int ind) {
     CellsStates *states = CellsStates::getInstance();
     states->setApplication(ind);
+    ui->app_view->handle_general_update();
 }
 
 void MainWindow::handle_image_button(bool checked) {

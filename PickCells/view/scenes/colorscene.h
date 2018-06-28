@@ -11,11 +11,6 @@
 #include <iostream>
 using namespace std;
 
-enum SwatchState {
-    Auto       = 0,
-    Master     = 1
-};
-
 class ColorScene : public Scene
 {
 public:
@@ -33,8 +28,8 @@ public:
     QList<QRectF> handleEvent(int x, int y, bool release);
 
 private:
-    QMap<QString, int> swatch_states;
-    QMap<QString, bool> swatches_visible;
+//    QMap<QString, int> swatch_states;
+//    QMap<QString, bool> swatches_visible;
     QMap<QString, Swatch*> swatches;
 
     QGraphicsScene *_scene;

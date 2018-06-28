@@ -109,11 +109,13 @@ void AppsView::updateStates() {
             }
         }
 
-        _test_app.unsetWidgets(_scene);
+        _test_app.setWidgets(_scene);
         _test_app.initializeScene(_brick_size);
+        _test_app.unsetWidgets(_scene);
 
-        _color_app.unsetWidgets(_scene);
+        _color_app.setWidgets(_scene);
         _color_app.initializeScene(_brick_size);
+        _color_app.unsetWidgets(_scene);
 
         _cur_scene->setWidgets(_scene);
 
