@@ -147,13 +147,6 @@ void AppsView::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void AppsView::handle_new_touchframe(QJsonObject jsonObject) {
-    // datelog("Client ("+data["IMEI"]+") says: Touch frame!");
-    // datelog("Client ("+data["IMEI"]+")         x: "+data["x"]); / 240
-    // datelog("Client ("+data["IMEI"]+")         y: "+data["y"]); / 240
-    // datelog("Client ("+data["IMEI"]+")        id: "+data["id"]);
-    // datelog("Client ("+data["IMEI"]+")      type: "+data["type"]);
-
-    qDebug() << jsonObject["IMEI"].toString();
     CellsStates *states = CellsStates::getInstance();
     int x, y;
     bool success = states->getCellTopLeft(jsonObject["IMEI"].toString(), &x, &y);
@@ -215,7 +208,6 @@ void AppsView::handle_new_configuration(QString configuration) {
 }
 
 void AppsView::updateMouseEvent(QMouseEvent *event, bool release) {
-    qDebug() << "x: " << event->x() << "  y: " << event->y();
     QList<QRectF> rect_to_update;
     if (_cur_scene != NULL) {
         rect_to_update = _cur_scene->handleEvent(event->x(), event->y(), release);

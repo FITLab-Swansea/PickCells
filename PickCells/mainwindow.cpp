@@ -217,7 +217,7 @@ void MainWindow::disconnected() {
 }
 
 void MainWindow::bytesWritten(qint64 bytes) {
-    qDebug() << "We wrote: " << bytes;
+    //qDebug() << "We wrote: " << bytes;
 }
 
 void MainWindow::readyRead() {

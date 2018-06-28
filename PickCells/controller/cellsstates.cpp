@@ -63,7 +63,7 @@ void CellsStates::updateStates() {
         QList<Cell*> _currrent_cells;
         for (int k = 0; k < watches.size(); k ++) {
             QString watch_id = watches[k].toString();
-            qDebug() << "  -> watch " << k << " " << watch_id;
+            // qDebug() << "  -> watch " << k << " " << watch_id;
 
             bool available = false;
             for (int l = 0; l < _available_cells.size(); l++) {
@@ -90,7 +90,7 @@ void CellsStates::updateStates() {
         _available_cells = _currrent_cells;
 
         // Update devices (must be sorted from most number of tiles to lowest)
-        qDebug() << "devices" << json_states["devices"];
+        // qDebug() << "devices" << json_states["devices"];
         QJsonArray devices = json_states["devices"].toArray();
 
         QList<QPair<int,int> > order;
@@ -109,11 +109,11 @@ void CellsStates::updateStates() {
             _nb_devices++;
             int place = order[k].second;
 
-            qDebug() << "  -> device " << place;
+            // qDebug() << "  -> device " << place;
             QJsonObject device = devices[place].toObject();
-            qDebug() << "      -> min_x " << device["min_x"].toInt() << "  max_x " << device["max_x"].toInt();
-            qDebug() << "      -> min_y " << device["min_y"].toInt() << "  max_y " << device["max_y"].toInt();
-            qDebug() << "      -> min_z " << device["min_z"].toInt() << "  max_z " << device["max_z"].toInt();
+            // qDebug() << "      -> min_x " << device["min_x"].toInt() << "  max_x " << device["max_x"].toInt();
+            // qDebug() << "      -> min_y " << device["min_y"].toInt() << "  max_y " << device["max_y"].toInt();
+            // qDebug() << "      -> min_z " << device["min_z"].toInt() << "  max_z " << device["max_z"].toInt();
 
 
             _cell_states->append(PCDevice());
@@ -137,13 +137,13 @@ void CellsStates::updateStates() {
             int start_x = device["min_x"].toInt();
             int start_y = device["min_y"].toInt();
             int start_z = device["min_z"].toInt();
-            qDebug() << "      -> connections";
+            // qDebug() << "      -> connections";
             QJsonObject connections = device["connections"].toObject();
             connections.keys().size();
             foreach(const QString& key, connections.keys()) {
                 QJsonObject con = connections[key].toObject();
-                qDebug() << "          -> " << key;
-                qDebug() << "             " << con;
+                // qDebug() << "          -> " << key;
+                // qDebug() << "             " << con;
 
                 int x = con["x"].toInt() - start_x;
                 int y = con["y"].toInt() - start_y;

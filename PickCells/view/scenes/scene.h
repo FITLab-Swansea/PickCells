@@ -44,7 +44,7 @@ public:
     }
 
     void handle_configuration_scene() {}
-    void handle_action_scene(QString action) { qDebug() << "Error action scene!" << action << "does not exist"; }
+    void handle_action_scene(QString action) { /*qDebug() << "Error action scene!" << action << "does not exist";*/ }
 
     virtual void setWidgets(QGraphicsScene *scene) = 0;
     virtual void unsetWidgets(QGraphicsScene *scene) = 0;

@@ -51,7 +51,7 @@ public:
     int getTime() { return timer.elapsed(); }
     void startTime() { timer.restart(); }
 
-    void setColorChanged(bool val) { color_changed = val; }
+    void setColorChanged(bool val) { color_changed = val; color_can_change = val; }
     bool getColorChanged() { return color_changed; }
     bool colorCanChange(int x, int y);
     void setInitialXY(int x, int y);
@@ -63,6 +63,12 @@ public:
     bool swatche_visible;
     SwatchState swatche_state;
 
+    bool color_to_be_set;
+    bool processed;
+    QPair<int, int> swatche_pos;
+
+    QColor background;
+
 private:
     int width;
     int height;
@@ -73,7 +79,6 @@ private:
     bool active;
 
     QColor pen_background;
-    QColor background;
 
     QString action;
     QString long_action;
@@ -84,6 +89,8 @@ private:
     int _init_y;
     QColor init_background;
     ColorDimension cur_dimension;
+
+    bool color_can_change;
 };
 
 #endif // SWATCH_H

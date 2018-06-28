@@ -52,7 +52,9 @@ void Swatch::setColorBackground(QColor pen, QColor backgd) {
 bool Swatch::colorCanChange(int x, int y) {
     float ratio_dx = (x - _init_x) / ((float) width);
     float ratio_dy = (y - _init_y) / ((float) height);
-    return (abs(ratio_dx) > 0.1) ||  (abs(ratio_dy) > 0.1);
+    //qDebug() << abs(ratio_dx) << "    " << abs(ratio_dy);
+    color_can_change = color_can_change || (abs(ratio_dx) > 0.05) ||  (abs(ratio_dy) > 0.05);
+    return color_can_change;
 }
 
 void Swatch::setInitialXY(int x, int y) {
@@ -102,9 +104,7 @@ void Swatch::changeColor(int x, int y) {
     }
     col.setHsvF(h,s,v);
 
-    qDebug() << background << "    " << cur_dimension << "   " << ratio_y << "  " << ratio_dx << "  " << ratio_dy;
     background = col;
-    qDebug() << background;
     color_changed = true;
     update();
 }

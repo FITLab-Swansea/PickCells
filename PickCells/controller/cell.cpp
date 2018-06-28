@@ -56,6 +56,6 @@ void Cell::setDebug(bool val) {
 }
 
 void Cell::sendNewVisual() {
-    qDebug() << "updating cell " << _cell_id;
+    //qDebug() << "updating cell " << _cell_id;
     emit visualUpdate(_cell_id,_avatar->getPixmap());
 }
