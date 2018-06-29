@@ -20,8 +20,11 @@ var list_imei_client = {};
 var qt_client = null;
 
 var watch_params = {
-  'touch_framerate': 5, // in Hz -1 for normal frame rate
-  354082061274638: {0:2, 1:1, 2:0, 3:3}
+  'touch_framerate': 10, // in Hz -1 for normal frame rate
+  354082061274564: {0:0, 1:1, 2:2, 3:3},
+  354082061274655: {0:0, 1:1, 2:2, 3:3},
+  354082061243744: {0:0, 1:1, 2:2, 3:3},
+  354082061243843: {0:0, 1:1, 2:2, 3:3}
 };
 
 var buffer_qt = null;

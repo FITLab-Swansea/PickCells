@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
 
+    QTimer::singleShot(1000, this, SLOT(bufferrizingImg()));
 }
 
 MainWindow::~MainWindow() {
@@ -246,36 +247,9 @@ void MainWindow::readyRead() {
 }
 
 void MainWindow::handleVisualUpdate(QString str, QPixmap * pix_ptr) {
-    if (socket->isOpen()) {
-        int require_w = 64;//128;
-        int require_h = 64;//128;
-        QPixmap pix = pix_ptr->scaled(require_w,require_h);
-        int size_id = str.length() + 3 + 2;
-        // "img:charoftheid:whrgbrgbrgb...
-        QByteArray data(require_w*require_h*3 + 2 + size_id + 1,'\n');
-
-        data[0] = 'i';
-        data[1] = 'm';
-        data[2] = 'g';
-        data[3] = ':';
-        for (int k = 0; k < str.length(); k++) {
-            data[4+k] = str.toStdString().c_str()[k];
-        }
-        data[size_id-1] = ':';
-
-        data[size_id+0] = (unsigned int) require_w;
-        data[size_id+1] = (unsigned int) require_h;
-        int k = 2;
-        for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
-            for (int pix_y = 0; pix_y < pix.height(); pix_y++) {
-                QRgb pixel = pix.toImage().pixel(pix_x,pix_y);
-                data[size_id+k] = (unsigned int) ((pixel >> 16) & 0xff); k++;
-                data[size_id+k] = (unsigned int) ((pixel >> 8) & 0xff); k++;
-                data[size_id+k] = (unsigned int) (pixel & 0xff); k++;
-            }
-        }
-        socket->write(data);
-    }
+    mutex.lock();
+    buffer[str] = pix_ptr;
+    mutex.unlock();
 }
 
 void MainWindow::dummy_touch() {
@@ -285,4 +259,54 @@ void MainWindow::dummy_touch() {
 
         QTimer::singleShot(250, this, SLOT(dummy_touch()));
     }
+}
+
+void MainWindow::bufferrizingImg() {
+    if (!socket->isOpen()) {
+        QTimer::singleShot(1000, this, SLOT(bufferrizingImg()));
+        return;
+    }
+
+    QList<QString> keys = buffer.keys();
+    mutex.lock();
+    for (int i = 0; i < keys.length(); i++) {
+        QString str = keys[i];
+        QPixmap * pix_ptr = buffer[str];
+        if (pix_ptr != NULL) {
+            qDebug() << "Updating " << str;
+            buffer[str] = NULL;
+
+            int require_w = 64;//128;
+            int require_h = 64;//128;
+            qDebug() << pix_ptr;
+            QPixmap pix = pix_ptr->scaled(require_w,require_h);
+            int size_id = str.length() + 3 + 2;
+            // "img:charoftheid:whrgbrgbrgb...
+            QByteArray data(require_w*require_h*3 + 2 + size_id + 1,'\n');
+
+            data[0] = 'i';
+            data[1] = 'm';
+            data[2] = 'g';
+            data[3] = ':';
+            for (int k = 0; k < str.length(); k++) {
+                data[4+k] = str.toStdString().c_str()[k];
+            }
+            data[size_id-1] = ':';
+
+            data[size_id+0] = (unsigned int) require_w;
+            data[size_id+1] = (unsigned int) require_h;
+            int k = 2;
+            for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
+                for (int pix_y = 0; pix_y < pix.height(); pix_y++) {
+                    QRgb pixel = pix.toImage().pixel(pix_x,pix_y);
+                    data[size_id+k] = (unsigned int) ((pixel >> 16) & 0xff); k++;
+                    data[size_id+k] = (unsigned int) ((pixel >> 8) & 0xff); k++;
+                    data[size_id+k] = (unsigned int) (pixel & 0xff); k++;
+                }
+            }
+            socket->write(data);
+        }
+    }
+    mutex.unlock();
+    QTimer::singleShot(200, this, SLOT(bufferrizingImg()));
 }

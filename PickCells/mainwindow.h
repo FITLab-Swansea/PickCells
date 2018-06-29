@@ -13,6 +13,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include <QMutex>
+
 #include "controller/cellsstates.h"
 
 #include <QDebug>
@@ -47,12 +49,17 @@ public slots:
 
     void dummy_touch();
 
+    void bufferrizingImg();
+
 private:
     Ui::MainWindow *ui;
 
     QTcpSocket *socket;
 
     QList<QJsonObject> list;
+
+    QMutex mutex;
+    QMap<QString, QPixmap*> buffer;
 };
 
 #endif // MAINWINDOW_H

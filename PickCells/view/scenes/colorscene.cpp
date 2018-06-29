@@ -36,7 +36,7 @@ void ColorScene::unsetSwatches() {
 void ColorScene::handle_configuration() {
     handle_configuration_scene();
 
-    qDebug() << "handle_configuration";
+    // qDebug() << "handle_configuration";
 
     unsetSwatches();
     QList<QString> swatches_id = swatches.keys();
@@ -110,14 +110,14 @@ void ColorScene::handle_configuration() {
                 new_masters.clear();
 
                 // Hue
-                qDebug() << "####### Hue";
+                // qDebug() << "####### Hue";
                 to_process_masters = old_masters;
                 while (to_process_masters.length()) {
                     QString cur_master = to_process_masters.first();
                     to_process_masters.pop_front();
                     int x = swatches[cur_master]->swatche_pos.first;
                     int y = swatches[cur_master]->swatche_pos.second;
-                    qDebug() << "master " << cur_master << " " << x << " " << y;
+                    // qDebug() << "master " << cur_master << " " << x << " " << y;
                     swatches[cur_master]->processed = true;
 
                     for (int k = 0; k < masters_and_autos[device].length(); k++) {
@@ -171,8 +171,8 @@ void ColorScene::handle_configuration() {
                         }
                     }
                     if (top_y == -9999) { top_y = y; }
-                    qDebug() << "   -> top         " << top_swatch;
-                    qDebug() << "      top_y min_y " << top_y << " " << min_y;
+                    // qDebug() << "   -> top         " << top_swatch;
+                    // qDebug() << "      top_y min_y " << top_y << " " << min_y;
 
                     // bottom
                     QString bot_swatch = "";
@@ -196,8 +196,8 @@ void ColorScene::handle_configuration() {
                         }
                     }
                     if (bot_y == 9999) { bot_y = y; }
-                    qDebug() << "   -> bot         " << bot_swatch;
-                    qDebug() << "      bot_y max_y " << bot_y << " " << max_y;
+                    // qDebug() << "   -> bot         " << bot_swatch;
+                    // qDebug() << "      bot_y max_y " << bot_y << " " << max_y;
 
                     // set auto only one master
                     if ((bot_swatch == QString("")) && (top_swatch == QString(""))) {
@@ -221,11 +221,11 @@ void ColorScene::handle_configuration() {
                                     col.setHsvF(h,s,v);
                                     swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto only one master";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    // qDebug() << "      set auto only one master";
+                                    // qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                    // qDebug() << "          ratio " << ratio;
+                                    // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                 }
                             }
                         }
@@ -257,12 +257,12 @@ void ColorScene::handle_configuration() {
                                         col.setHsvF(h,s,v);
                                         swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                        qDebug() << "      set auto above master -- when below";
-                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                        qDebug() << "          ratio " << ratio;
-                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                        qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
-                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        // qDebug() << "      set auto above master -- when below";
+                                        // qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        // qDebug() << "          ratio " << ratio;
+                                        // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        // qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
+                                        // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                     }
                                 }
                             }
@@ -295,12 +295,12 @@ void ColorScene::handle_configuration() {
                                         col.setHsvF(h,s,v);
                                         swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                        qDebug() << "      set auto below master -- when above";
-                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                        qDebug() << "          ratio " << ratio;
-                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                        qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
-                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        // qDebug() << "      set auto below master -- when above";
+                                        // qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        // qDebug() << "          ratio " << ratio;
+                                        // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        // qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
+                                        // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                     }
                                 }
                             }
@@ -333,12 +333,12 @@ void ColorScene::handle_configuration() {
                                         col.setHsvF(h,s,v);
                                         swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                        qDebug() << "      set auto between master -- top";
-                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                        qDebug() << "          ratio " << ratio;
-                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                        qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
-                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        // qDebug() << "      set auto between master -- top";
+                                        // qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        // qDebug() << "          ratio " << ratio;
+                                        // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        // qDebug() << "          hsv t " << h_t << " " << s_t << " " << v_t;
+                                        // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                     }
                                 }
                             }
@@ -371,12 +371,12 @@ void ColorScene::handle_configuration() {
                                         col.setHsvF(h,s,v);
                                         swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                        qDebug() << "      set auto between master -- bot";
-                                        qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
-                                        qDebug() << "          ratio " << ratio;
-                                        qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                        qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
-                                        qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                        // qDebug() << "      set auto between master -- bot";
+                                        // qDebug() << "      setting   " << to_process_autos[k] << " " << _y;
+                                        // qDebug() << "          ratio " << ratio;
+                                        // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                        // qDebug() << "          hsv b " << h_b << " " << s_b << " " << v_b;
+                                        // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                     }
                                 }
                             }
@@ -385,14 +385,14 @@ void ColorScene::handle_configuration() {
                 }
 
                 // Value
-                qDebug() << "####### Value";
+                // qDebug() << "####### Value";
                 to_process_masters = old_masters;
                 while (to_process_masters.length()) {
                     QString cur_master = to_process_masters.first();
                     to_process_masters.pop_front();
                     int x = swatches[cur_master]->swatche_pos.first;
                     int y = swatches[cur_master]->swatche_pos.second;
-                    qDebug() << "master " << cur_master << " " << x << " " << y;
+                    // qDebug() << "master " << cur_master << " " << x << " " << y;
                     swatches[cur_master]->processed = true;
 
                     for (int k = 0; k < masters_and_autos[device].length(); k++) {
@@ -446,8 +446,8 @@ void ColorScene::handle_configuration() {
                         }
                     }
                     if (left_x == -9999) { left_x = x; }
-                    qDebug() << "   -> left         " << left_swatch;
-                    qDebug() << "      left_x min_x " << left_x << " " << min_x;
+                    // qDebug() << "   -> left         " << left_swatch;
+                    // qDebug() << "      left_x min_x " << left_x << " " << min_x;
 
                     // right
                     QString right_swatch = "";
@@ -471,8 +471,8 @@ void ColorScene::handle_configuration() {
                         }
                     }
                     if (right_x == 9999) { right_x = x; }
-                    qDebug() << "   -> right         " << right_swatch;
-                    qDebug() << "      right_x max_x " << right_x << " " << max_x;
+                    // qDebug() << "   -> right         " << right_swatch;
+                    // qDebug() << "      right_x max_x " << right_x << " " << max_x;
 
 
                     // set auto between master -- left
@@ -501,12 +501,12 @@ void ColorScene::handle_configuration() {
                                     col.setHsvF(h,s,v);
                                     swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto between master -- left";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv l " << h_l << " " << s_l << " " << v_l;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    // qDebug() << "      set auto between master -- left";
+                                    // qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    // qDebug() << "          ratio " << ratio;
+                                    // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    // qDebug() << "          hsv l " << h_l << " " << s_l << " " << v_l;
+                                    // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                 }
                             }
                         }
@@ -526,7 +526,7 @@ void ColorScene::handle_configuration() {
                                     qreal h_r, s_r, v_r;
                                     swatches[right_swatch]->background.getHsvF(&h_r, &s_r, &v_r);
 
-                                    qDebug() << x << " -- " << _x << " -- " << right_x;
+                                    // qDebug() << x << " -- " << _x << " -- " << right_x;
                                     float ratio = ((float)(x - _x)) / ((float)(x - right_x));
 
                                     QColor col;
@@ -539,12 +539,12 @@ void ColorScene::handle_configuration() {
                                     col.setHsvF(h,s,v);
                                     swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto between master -- right";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv r " << h_r << " " << s_r << " " << v_r;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    // qDebug() << "      set auto between master -- right";
+                                    // qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    // qDebug() << "          ratio " << ratio;
+                                    // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    // qDebug() << "          hsv r " << h_r << " " << s_r << " " << v_r;
+                                    // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                 }
                             }
                         }
@@ -571,11 +571,11 @@ void ColorScene::handle_configuration() {
                                     col.setHsvF(h,s,v);
                                     swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto no master -- left";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    // qDebug() << "      set auto no master -- left";
+                                    // qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    // qDebug() << "          ratio " << ratio;
+                                    // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                 }
                             }
                         }
@@ -602,18 +602,18 @@ void ColorScene::handle_configuration() {
                                     col.setHsvF(h,s,v);
                                     swatches[to_process_autos[k]]->setColorBackground(col,col);
 
-                                    qDebug() << "      set auto no master -- right";
-                                    qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
-                                    qDebug() << "          ratio " << ratio;
-                                    qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
-                                    qDebug() << "          hsv   " << h << " " << s << " " << v;
+                                    // qDebug() << "      set auto no master -- right";
+                                    // qDebug() << "      setting   " << to_process_autos[k] << " " << _x;
+                                    // qDebug() << "          ratio " << ratio;
+                                    // qDebug() << "          hsv m " << h_m << " " << s_m << " " << v_m;
+                                    // qDebug() << "          hsv   " << h << " " << s << " " << v;
                                 }
                             }
                         }
                     }
                 }
 
-                qDebug() << new_masters;
+                // qDebug() << new_masters;
             }
         }
     }

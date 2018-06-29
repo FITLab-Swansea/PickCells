@@ -26,7 +26,7 @@ public:
 
     void setSeen(bool val) { _is_seen = val; }
 
-    void setPixmap(QPixmap val) { _pixmap = val; }
+    void setPixmap(QPixmap val) { _pixmap = QPixmap(val); }
     QPixmap* getPixmap() { return &_pixmap; }
 
 private:
