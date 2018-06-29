@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     final int handlerState = 0;        				 //used to identify handler message
     private StringBuilder recDataString = new StringBuilder();
 
-    Button buttonSend;
+    // Button buttonSend;
     TextView textView;
     RelativeLayout layout;
 
@@ -117,12 +117,10 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         adapter = BluetoothAdapter.getDefaultAdapter();
 
         // Grab references to UI elements.
-        messages = (TextView) findViewById(R.id.messages);
-        messages.setText("No Changes");
-        input = (EditText) findViewById(R.id.editText);
+        // messages.setText("No Changes");
 
-        buttonSend = (Button) findViewById(R.id.button);
-        buttonSend.setOnClickListener(this);
+//        buttonSend = (Button) findViewById(R.id.button);
+//        buttonSend.setOnClickListener(this);
 
         textView = (TextView) findViewById(R.id.textView2);
         layout = (RelativeLayout)findViewById(R.id.main_layout);
@@ -172,14 +170,14 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                                 for (int i = 0; i < 5; i++){
                                     Log.v("Handler", "Active Side: " + activeSides[i]);
                                     if (activeSides[i] == 1) {
-                                         messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3] + ", " + activeSides[4]);
+                                         // messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3] + ", " + activeSides[4]);
 
                                     } else {
                                         emptySides++;
                                     }
                                 }
                                 if (emptySides == 5){
-                                    messages.setText("No Active Side");
+                                    // messages.setText("No Active Side");
                                 }
                             }
 
