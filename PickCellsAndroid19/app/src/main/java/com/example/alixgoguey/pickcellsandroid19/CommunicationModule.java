@@ -207,7 +207,7 @@ public class CommunicationModule {
         } else if (side == 2) {
             return new_south;
         } else if (side == 3) {
-            return new_south;
+            return new_west;
         }
         return side;
     }
@@ -220,7 +220,7 @@ public class CommunicationModule {
         } else if (side.contains("2")) {
             side = ""+new_south;
         } else if (side.contains("3")) {
-            side = ""+new_south;
+            side = ""+new_west;
         }
         return side;
     }
