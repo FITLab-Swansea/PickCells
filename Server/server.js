@@ -24,7 +24,9 @@ var watch_params = {
   354082061274564: {0:0, 1:1, 2:2, 3:3},
   354082061274655: {0:0, 1:1, 2:2, 3:3},
   354082061243744: {0:0, 1:1, 2:2, 3:3},
-  354082061243843: {0:0, 1:1, 2:2, 3:3}
+  354082061243843: {0:0, 1:1, 2:2, 3:3},
+  354082061274638: {0:2, 1:1, 2:0, 3:3},
+  354082061274492: {0:0, 1:1, 2:2, 3:3}
 };
 
 var buffer_qt = null;
@@ -389,18 +391,23 @@ server.listen(PORT, ADDRESS);
 function parse_buffer(data) {
     datelog("Data from Qt App received ("+Buffer(data).length+" bytes)");
     if (Buffer(data).length > 3) {
-      var index = Buffer(data).indexOf(':',0,'utf8');
-      if ((index >= 0) && (index < Buffer(data).length)) {
+      //var index = Buffer(data).indexOf(':',0,'utf8');
+      //var mid_str_len = 1;
+      var index = Buffer(data).indexOf(':instop:',0,'utf8');
+      var mid_str_len = 8;
+      if ((index >= 0) && (index <= Buffer(data).length-mid_str_len)) {
         var tag = Buffer(data).slice(0,index).toString('utf8');
         datelog("   -> tag "+tag);
         if (tag == "img") {
-          data = Buffer(data).slice(index+1,Buffer(data).length);
-          index = Buffer(data).indexOf(':',0,'utf8');
-          if ((index >= 0) && (index < Buffer(data).length-1)) {
+          data = Buffer(data).slice(index+mid_str_len,Buffer(data).length);
+          //index = Buffer(data).indexOf(':',0,'utf8');
+          index = Buffer(data).indexOf(':instop:',0,'utf8');
+          //if ((index >= 0) && (index < Buffer(data).length-1)) {
+          if ((index >= 0) && (index <= Buffer(data).length-mid_str_len)) {
             var imei = Buffer(data).slice(0,index).toString('utf8');
             datelog("   -> img received, on instance to be send to "+imei);
             if (imei in list_imei_client) {
-              var msg = Buffer(data).slice(index+1,Buffer(data).length);
+              var msg = Buffer(data).slice(index+mid_str_len,Buffer(data).length);
               datelog("   -> img sent to "+imei+" ("+msg.length+" bytes)");
               list_imei_client[imei]['socket'].emit('qt', {"msg": JSON.stringify(msg,'utf8')});
             }
@@ -428,14 +435,17 @@ function onClientConnected(socket) {
         data = Buffer.concat([prev_buf, data]);
       }
       datelog("Buffer adjustment ("+data.length+" bytes)");
-      var index = Buffer(data).indexOf('\n',0,'utf8');
-      if ((index >= 0) && (index < Buffer(data).length)) {
+      //var index = Buffer(data).indexOf('\n',0,'utf8');
+      //var end_str_len = 1;
+      var index = Buffer(data).indexOf(':endstop:',0,'utf8');
+      var end_str_len = 9;
+      if ((index >= 0) && (index <= Buffer(data).length-end_str_len)) {
         parse_buffer(Buffer(data).slice(0,index));
         prev_buf = null;
-        if (index == Buffer(data).length-1) {
+        if (index == Buffer(data).length-end_str_len) {
           datelog("Buffer reset");
         } else {
-          data = Buffer(data).slice(index+1,Buffer(data).length);
+          data = Buffer(data).slice(index+end_str_len,Buffer(data).length);
           datelog("Buffer trimmed ("+Buffer(data).length+" bytes)");
           new_data = true;
         }

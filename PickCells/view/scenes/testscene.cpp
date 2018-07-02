@@ -50,7 +50,7 @@ void TestScene::initializeScene(int brick_size) {
     button_list.append(c_but);
 }
 
-QList<QRectF> TestScene::handleEvent(int x, int y, bool release) {
+QList<QRectF> TestScene::handleEvent(int x, int y, bool release, bool ctrl_button) {
     QList<QRectF> to_update;
     bool but_active = false;
     for (int k = 0; k < button_list.size(); k++) {

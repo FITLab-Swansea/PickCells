@@ -40,10 +40,15 @@ public:
 
     void sceneUpdate() { _scene->update(); }
 
+signals:
+    void display_info(QString);
+
 public slots:
     void handle_general_update();
     void handle_actions(QString action);
     void handle_new_configuration(QString configuration);
+
+    void handle_display_info(QString val);
 
 private:
     void updateMouseEvent(QMouseEvent *event, bool release);

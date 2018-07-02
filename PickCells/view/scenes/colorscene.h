@@ -6,6 +6,8 @@
 #include "../../controller/cellsstates.h"
 
 #include <QDateTime>
+#include <QClipboard>
+#include <QApplication>
 
 #include <QDebug>
 #include <iostream>
@@ -25,11 +27,9 @@ public:
 
 
     void initializeScene(int brick_size);
-    QList<QRectF> handleEvent(int x, int y, bool release);
+    QList<QRectF> handleEvent(int x, int y, bool release, bool ctrl_button);
 
 private:
-//    QMap<QString, int> swatch_states;
-//    QMap<QString, bool> swatches_visible;
     QMap<QString, Swatch*> swatches;
 
     QGraphicsScene *_scene;

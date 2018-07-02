@@ -16,7 +16,7 @@ class Scene : public QObject
 public:
     Scene() { is_set = false; }
     virtual void initializeScene(int brick_size) = 0;
-    virtual QList<QRectF> handleEvent(int x, int y, bool release) = 0;
+    virtual QList<QRectF> handleEvent(int x, int y, bool release, bool ctrl_button) = 0;
 
     void setWidgets_scene(QGraphicsScene *scene) {
         if (!is_set) {
@@ -56,6 +56,8 @@ public:
 signals:
     void action(QString);
     void need_general_update();
+    void display_info(QString);
+    void put_into_clip_board(QString);
 
 protected:
     bool is_set;

@@ -18,7 +18,7 @@ public:
     void handle_action(QString action);
 
     void initializeScene(int brick_size);
-    QList<QRectF> handleEvent(int x, int y, bool release);
+    QList<QRectF> handleEvent(int x, int y, bool release, bool ctrl_button);
 };
 
 #endif // TESTSCENE_H

@@ -52,6 +52,9 @@ public:
     QString getAction() { return action; }
     void setAction(QString val) { action = val; }
 
+    QString getCtrlAction() { return ctrl_action; }
+    void setCtrlAction(QString val) { ctrl_action = val; }
+
     QString getLongAction() { return long_action; }
     void setLongAction(QString val) { long_action = val; }
 
@@ -90,6 +93,7 @@ private:
     QColor pen_background;
 
     QString action;
+    QString ctrl_action;
     QString long_action;
 
     bool color_changed;

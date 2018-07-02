@@ -13,7 +13,9 @@ AppsView::AppsView(QWidget *parent) : QGraphicsView(parent) {
     connect(_general_update_timer, SIGNAL(timeout()), this, SLOT(handle_general_update()));
 
     connect(&_test_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_test_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
     connect(&_color_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_color_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
     _app_mapping["app_test"] = &_test_app;
     _app_mapping["app_color"] = &_color_app;
 
@@ -208,10 +210,15 @@ void AppsView::handle_new_configuration(QString configuration) {
 
 }
 
+void AppsView::handle_display_info(QString val) {
+    emit display_info(val);
+}
+
 void AppsView::updateMouseEvent(QMouseEvent *event, bool release) {
     QList<QRectF> rect_to_update;
     if (_cur_scene != NULL) {
-        rect_to_update = _cur_scene->handleEvent(event->x(), event->y(), release);
+        qDebug() << event->modifiers();
+        rect_to_update = _cur_scene->handleEvent(event->x(), event->y(), release, event->modifiers() == Qt::ControlModifier);
     }
 
     bool ptr_in = _mouse_ptr->isVisible();

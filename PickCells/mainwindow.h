@@ -38,7 +38,10 @@ public:
 public slots:
     void handle_debug_button(bool checked);
     void handle_debug_conf_button(int ind);
+    void handle_refresh_button(bool checked);
     void handle_image_button(bool checked);
+
+    void handle_display_info(QString val);
 
     void connected();
     void disconnected();
@@ -59,7 +62,7 @@ private:
     QList<QJsonObject> list;
 
     QMutex mutex;
-    QMap<QString, QPixmap*> buffer;
+    QMap<QString, QPixmap> buffer;
 };
 
 #endif // MAINWINDOW_H
