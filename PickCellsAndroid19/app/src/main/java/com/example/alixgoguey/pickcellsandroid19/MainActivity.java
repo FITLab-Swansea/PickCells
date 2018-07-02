@@ -155,7 +155,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                                 int int_side = Integer.parseInt(side);
                                 String attachDirection = recDataString.substring(4, dataInPrint.length());
                                 // Log.v("Handler", cubeID + " : "+attachDirection);
-                                Log.v("Handler", "Active Side: " + side);
+                                // Log.v("Handler", "Active Side: " + side);
                                 //messages.setText("Active Side: " + side);
 
                                 try {
@@ -168,7 +168,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
                                 int emptySides = 0;
                                 for (int i = 0; i < 5; i++){
-                                    Log.v("Handler", "Active Side: " + activeSides[i]);
+                                    // Log.v("Handler", "Active Side: " + activeSides[i]);
                                     if (activeSides[i] == 1) {
                                          // messages.setText("Active Side(s): " + activeSides[0]+ ", " + activeSides[1]+ ", " + activeSides[2]+ ", " + activeSides[3] + ", " + activeSides[4]);
 
@@ -186,7 +186,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
                         }
                         if (recDataString.charAt(0) == '*')	{
                             String dial = recDataString.substring(1,2);
-                            Log.v("Handler", "Dial Value: " + dialValue);
+                            // Log.v("Handler", "Dial Value: " + dialValue);
                             dialValue = Integer.parseInt(dial);
                         }
                         recDataString.delete(0, recDataString.length()); 					//clear all string data
