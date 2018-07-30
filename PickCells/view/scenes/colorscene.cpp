@@ -47,12 +47,16 @@ void ColorScene::handle_configuration() {
     QList<QList<QString > > masters_and_autos;
     QList<QList<QString > > masters;
     QList<QList<QString > > autos;
+
+    QList<QList<QString > > ccheckers;
     CellsStates *states = CellsStates::getInstance();
     int offset = 0;
     for (int device = 0; device < states->getNbDevices(); device++ ) {
         QList<QString > cur_masters_and_autos;
         QList<QString > cur_masters;
         QList<QString > cur_autos;
+
+        QList<QString > cur_ccheckers;
 
         offset += 1;
         for (int row = 0; row < states->getDeviceHeight(device); row++) {
@@ -81,9 +85,12 @@ void ColorScene::handle_configuration() {
                         if (swatches[c->getCellId()]->swatche_state == SwatchState::Auto) {
                             swatches[c->getCellId()]->color_to_be_set = true;
                             cur_autos.append(c->getCellId());
-                        } else {
+                        } else if (swatches[c->getCellId()]->swatche_state == SwatchState::Master) {
                             swatches[c->getCellId()]->color_to_be_set = false;
                             cur_masters.append(c->getCellId());
+                        } else if (swatches[c->getCellId()]->swatche_state == SwatchState::CChecker) {
+                            swatches[c->getCellId()]->color_to_be_set = true;
+                            cur_ccheckers.append(c->getCellId());
                         }
                         cur_masters_and_autos.append(c->getCellId());
                         break;
@@ -96,11 +103,42 @@ void ColorScene::handle_configuration() {
         masters_and_autos.append(cur_masters_and_autos);
         masters.append(cur_masters);
         autos.append(cur_autos);
+
+        ccheckers.append(cur_ccheckers);
     }
 
     // Update colors
     for (int device = 0; device < masters.length(); device++) {
-        if (masters.length()) {
+        if (ccheckers[device].length()) {
+            for (int l = 0; l < ccheckers[device].length(); l++) {
+                QString cur_cchecker = ccheckers[device][l];
+                int x = swatches[cur_cchecker]->swatche_pos.first;
+                int y = swatches[cur_cchecker]->swatche_pos.second;
+
+                // look left and right
+                QString left = "";
+                QString right = "";
+                for (int k = 0; k < masters_and_autos[device].length(); k++) {
+                    int _x = swatches[masters_and_autos[device][k]]->swatche_pos.first;
+                    int _y = swatches[masters_and_autos[device][k]]->swatche_pos.second;
+
+                    if ((_y == y) && (_x == x-1)) {
+                        left = masters_and_autos[device][k];
+                    } else if ((_y == y) && (_x == x+1)) {
+                        right = masters_and_autos[device][k];
+                    }
+                }
+
+                swatches[cur_cchecker]->cchecker_val = QString("XX.XXX");
+                swatches[cur_cchecker]->cchecker_state = QString("NONE");
+                swatches[cur_cchecker]->bg_background = QColor("black");
+                swatches[cur_cchecker]->txt_background = QColor("white");
+
+                if ((left != QString("")) && (right != QString(""))) {
+                    swatches[cur_cchecker]->checkColor(swatches[left]->background, swatches[right]->background);
+                }
+            }
+        } else if (masters[device].length()) {
             QList<QString> to_process_masters = masters[device];
             QList<QString> to_process_autos = autos[device];
 
@@ -632,7 +670,9 @@ void ColorScene::handle_action(QString action) {
             if (swatches[act_id[1]]->swatche_state == SwatchState::Auto) {
                 swatches[act_id[1]]->swatche_state = SwatchState::Master;
                 swatches[act_id[1]]->setColorBackground(QColor("#990000"), swatches[act_id[1]]->background);
-            } else {
+            } else if (swatches[act_id[1]]->swatche_state == SwatchState::Master) {
+                swatches[act_id[1]]->swatche_state = SwatchState::CChecker;
+            } else if (swatches[act_id[1]]->swatche_state == SwatchState::CChecker) {
                 swatches[act_id[1]]->swatche_state = SwatchState::Auto;
                 swatches[act_id[1]]->setColorBackground(swatches[act_id[1]]->background, swatches[act_id[1]]->background);
             }

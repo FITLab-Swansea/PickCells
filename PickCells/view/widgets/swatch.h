@@ -14,7 +14,8 @@ using namespace std;
 
 enum SwatchState {
     Auto       = 0,
-    Master     = 1
+    Master     = 1,
+    CChecker   = 2
 };
 
 enum ColorDimension {
@@ -70,6 +71,8 @@ public:
 
     void changeColor(int x, int y);
 
+    void checkColor(QColor bg, QColor txt);
+
     bool swatche_visible;
     SwatchState swatche_state;
 
@@ -79,6 +82,11 @@ public:
 
     QColor background;
 
+    QColor bg_background;
+    QColor txt_background;
+    QString cchecker_val;
+    QString cchecker_state;
+
     Reach reachable;
 
 private:
@@ -87,6 +95,12 @@ private:
 
     int offset;
     QPainterPath path;
+    QPainterPath top_cchecker_path;
+    QPainterPath bot_cchecker_path;
+    QRect bg_rectangle;
+    QRect top_rectangle;
+    QRect bot_rectangle;
+    QRect txt_rectangle;
 
     bool active;
 
