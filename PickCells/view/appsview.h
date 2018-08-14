@@ -17,6 +17,10 @@
 #include "scenes/scene.h"
 #include "scenes/testscene.h"
 #include "scenes/colorscene.h"
+#include "scenes/socialscene.h"
+#include "scenes/lockscene.h"
+#include "scenes/artscene.h"
+#include "scenes/checkscene.h"
 
 #include <QDebug>
 #include <iostream>
@@ -65,10 +69,15 @@ private:
     QMap<QPair<QString, QString>, QString> _configuration_mapping;
 
     QMap<QString, Scene*> _app_mapping;
+    Scene* _next_configuration;
     QString _cur_scene_name;
     Scene* _cur_scene;
     TestScene _test_app;
     ColorScene _color_app;
+    SocialScene _social_app;
+    LockScene _lock_app;
+    ArtScene _art_app;
+    CheckScene _check_app;
 };
 
 #endif // APPSVIEW_H

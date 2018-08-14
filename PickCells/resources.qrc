@@ -6,5 +6,34 @@
         <file>imgs/picture.png</file>
         <file>imgs/settings.png</file>
         <file>imgs/refresh.png</file>
+        <file>imgs/facebook.png</file>
+        <file>imgs/gmail.png</file>
+        <file>imgs/network.png</file>
+        <file>imgs/open-book.png</file>
+        <file>imgs/facebook-lock.png</file>
+        <file>imgs/gmail-lock.png</file>
+        <file>imgs/four-ko.png</file>
+        <file>imgs/four-ok.png</file>
+        <file>imgs/locked.png</file>
+        <file>imgs/one-ko.png</file>
+        <file>imgs/one-ok.png</file>
+        <file>imgs/three-ko.png</file>
+        <file>imgs/three-ok.png</file>
+        <file>imgs/two-ko.png</file>
+        <file>imgs/two-ok.png</file>
+        <file>imgs/unlocked.png</file>
+        <file>imgs/art1.png</file>
+        <file>imgs/art2.png</file>
+        <file>imgs/art3.png</file>
+        <file>imgs/art4.png</file>
+        <file>imgs/art5.png</file>
+        <file>imgs/art6.png</file>
+        <file>imgs/art0.png</file>
+        <file>imgs/commands.png</file>
+        <file>imgs/text.png</file>
+        <file>imgs/tick1.png</file>
+        <file>imgs/tick2.png</file>
+        <file>imgs/tick3.png</file>
+        <file>imgs/tick4.png</file>
     </qresource>
 </RCC>

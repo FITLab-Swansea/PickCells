@@ -528,4 +528,38 @@ datelog('Server for Qt started at: ' + ADDRESS + ':' + PORT);
 //             ],
 //   'watches': ['111', '222', '333', '444', '555', '666', '777', '888', '011', '022', '033', '044', '055', '066']
 // };
+
+configuration = {
+  "devices":[{
+                "min_x":0,"max_x":0,"min_y":0,"max_y":0,"min_z":0,"max_z":0,
+                "connections":{
+                      "354082061274564":{"x":0,"y":0,"z":0,"B":null,"T":null,"N":null,"S":null,"E":null,"W":null}
+                              }
+              },{
+                "min_x":0,"max_x":0,"min_y":0,"max_y":0,"min_z":0,"max_z":0,
+                "connections":{
+                      "354082061274638":{"x":0,"y":0,"z":0,"B":null,"T":null,"N":null,"S":null,"E":null,"W":null}
+                              }
+              },{
+                "min_x":0,"max_x":0,"min_y":0,"max_y":0,"min_z":0,"max_z":0,
+                "connections":{
+                      "354082061243744":{"x":0,"y":0,"z":0,"B":null,"T":null,"N":null,"S":null,"E":null,"W":null}
+                              }
+              },{
+                "min_x":0,"max_x":0,"min_y":0,"max_y":0,"min_z":0,"max_z":0,
+                "connections":{
+                      "354082061274492":{"x":0,"y":0,"z":0,"B":null,"T":null,"N":null,"S":null,"E":null,"W":null}
+                              }
+              },{
+                "min_x":0,"max_x":0,"min_y":0,"max_y":0,"min_z":0,"max_z":0,
+                "connections":{
+                      "354082061243843":{"x":0,"y":0,"z":0,"B":null,"T":null,"N":null,"S":null,"E":null,"W":null}
+                              }
+              },{
+                "min_x":0,"max_x":0,"min_y":0,"max_y":0,"min_z":0,"max_z":0,
+                "connections":{
+                      "354082061274655":{"x":0,"y":0,"z":0,"B":null,"T":null,"N":null,"S":null,"E":null,"W":null}
+                              }
+              }],
+  "watches":["354082061274638","354082061243744","354082061274492","354082061243843","354082061274655","354082061274564"]}
 // print_configuration();

@@ -16,14 +16,31 @@ AppsView::AppsView(QWidget *parent) : QGraphicsView(parent) {
     connect(&_test_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
     connect(&_color_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
     connect(&_color_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
+    connect(&_social_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_social_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
+    connect(&_lock_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_lock_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
+    connect(&_art_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_art_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
+    connect(&_check_app, SIGNAL(action(QString)), this, SLOT(handle_actions(QString)));
+    connect(&_check_app, SIGNAL(display_info(QString)), this, SLOT(handle_display_info(QString)));
     _app_mapping["app_test"] = &_test_app;
     _app_mapping["app_color"] = &_color_app;
+    _app_mapping["app_social"] = &_social_app;
+    _app_mapping["app_lock"] = &_lock_app;
+    _app_mapping["app_art"] = &_art_app;
+    _app_mapping["app_check"] = &_check_app;
 
     _configuration_mapping[QPair<QString, QString>("app_test","")] = "";
     _configuration_mapping[QPair<QString, QString>("app_color","")] = "";
+    _configuration_mapping[QPair<QString, QString>("app_social","")] = "";
+    _configuration_mapping[QPair<QString, QString>("app_lock","")] = "";
+    _configuration_mapping[QPair<QString, QString>("app_art","")] = "";
+    _configuration_mapping[QPair<QString, QString>("app_check","")] = "";
 
     _cur_scene = &_test_app;
     _cur_scene_name = "app_test";
+    _next_configuration = NULL;
 }
 
 AppsView::~AppsView() {
@@ -101,7 +118,11 @@ void AppsView::updateStates() {
                 if (s->hasContent()) {
                     rect_item->setPen(QPen());
                     //rect_item->setBrush(QBrush(QColor(50+k*(100/as->size()), 100, 255 - k*(100/as->size())),Qt::SolidPattern));
-                    rect_item->setBrush(QBrush(QColor("#2277FF")));
+                    if (_next_configuration != NULL) {
+                        rect_item->setBrush(QBrush(_next_configuration->getBackgroundColor()));
+                    } else {
+                        rect_item->setBrush(QBrush(_cur_scene->getBackgroundColor()));
+                    }
                 } else {
                     rect_item->setPen(QPen(Qt::black, 1, Qt::SolidLine));
                     rect_item->setBrush(QBrush(Qt::black,Qt::DiagCrossPattern));
@@ -118,6 +139,22 @@ void AppsView::updateStates() {
         _color_app.setWidgets(_scene);
         _color_app.initializeScene(_brick_size);
         _color_app.unsetWidgets(_scene);
+
+        _social_app.setWidgets(_scene);
+        _social_app.initializeScene(_brick_size);
+        _social_app.unsetWidgets(_scene);
+
+        _lock_app.setWidgets(_scene);
+        _lock_app.initializeScene(_brick_size);
+        _lock_app.unsetWidgets(_scene);
+
+        _art_app.setWidgets(_scene);
+        _art_app.initializeScene(_brick_size);
+        _art_app.unsetWidgets(_scene);
+
+        _check_app.setWidgets(_scene);
+        _check_app.initializeScene(_brick_size);
+        _check_app.unsetWidgets(_scene);
 
         _cur_scene->setWidgets(_scene);
 
@@ -197,6 +234,11 @@ void AppsView::handle_actions(QString action) {
 }
 
 void AppsView::handle_new_configuration(QString configuration) {
+    if (_app_mapping.contains(configuration)) {
+        _next_configuration = _app_mapping[configuration];
+    } else {
+        _next_configuration = NULL;
+    }
     updateStates();
 
     QPair<QString, QString> key(configuration,_cur_scene_name);

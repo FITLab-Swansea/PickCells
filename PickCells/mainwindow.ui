@@ -38,6 +38,26 @@
             <string>Color</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Social</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Lock</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Art</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>List</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>

@@ -63,6 +63,8 @@ private:
 
     QMutex mutex;
     QMap<QString, QPixmap> buffer;
+
+    QString custom_msg;
 };
 
 #endif // MAINWINDOW_H

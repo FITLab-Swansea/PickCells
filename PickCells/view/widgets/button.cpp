@@ -65,7 +65,7 @@ void Button::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
             if (!active) {
                 painter->setOpacity(1.0);
             } else {
-                painter->setOpacity(0.7);
+                painter->setOpacity(0.5);
             }
             painter->drawPixmap(x_icn, y_icn, w_icn, h_icn, icon);
         }

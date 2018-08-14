@@ -5,6 +5,7 @@
 #include <QList>
 #include <QGraphicsScene>
 #include "../widgets/button.h"
+#include "../../controller/cellsstates.h"
 
 #include <QDebug>
 #include <iostream>
@@ -14,7 +15,7 @@ class Scene : public QObject
 {
     Q_OBJECT
 public:
-    Scene() { is_set = false; }
+    Scene() { is_set = false; background_color = QColor("#2277FF"); }
     virtual void initializeScene(int brick_size) = 0;
     virtual QList<QRectF> handleEvent(int x, int y, bool release, bool ctrl_button) = 0;
 
@@ -53,6 +54,8 @@ public:
 
     bool isSet() { return is_set; }
 
+    QColor getBackgroundColor() { return background_color; }
+
 signals:
     void action(QString);
     void need_general_update();
@@ -64,6 +67,8 @@ protected:
     QList<Button*> button_list;
 
     int _brick_size;
+
+    QColor background_color;
 };
 
 #endif // SCENE_H

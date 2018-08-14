@@ -17,18 +17,12 @@ CellsStates *CellsStates::getInstance() {
 CellsStates::CellsStates(QObject *parent) : QObject(parent) {
     _debug = false;
     // _debug_conf = 0;
-    _appli = 2;
+    _appli = -1;
 }
 
 void CellsStates::initialize() {
 
-    // dummy for now
     _available_cells.clear();
-//    for (int k = 0; k < 2*4*8; k++) {
-//        Cell *c = new Cell();
-//        c->initialize(k);
-//        _available_cells.append(c);
-//    }
 
     _bricks_to_delete.clear();
 
@@ -37,6 +31,8 @@ void CellsStates::initialize() {
     _app_screens = NULL;
 
     json_set = false;
+
+    kw = "";
 
     updateStates();
 }
@@ -63,7 +59,7 @@ void CellsStates::updateStates() {
         QList<Cell*> _currrent_cells;
         for (int k = 0; k < watches.size(); k ++) {
             QString watch_id = watches[k].toString();
-            // qDebug() << "  -> watch " << k << " " << watch_id;
+             qDebug() << "  -> watch " << k << " " << watch_id;
 
             bool available = false;
             for (int l = 0; l < _available_cells.size(); l++) {
@@ -211,6 +207,14 @@ void CellsStates::updateStates() {
         configuration = "app_test";
     } else if (_appli == 1) {
         configuration = "app_color";
+    } else if (_appli == 2) {
+        configuration = "app_social";
+    } else if (_appli == 3) {
+        configuration = "app_lock";
+    } else if (_appli == 4) {
+        configuration = "app_art";
+    } else if (_appli == 5) {
+        configuration = "app_check";
     }
 
     emit new_configuration(configuration);

@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
 
     QTimer::singleShot(1000, this, SLOT(bufferrizingImg()));
+
+    custom_msg = "";
 }
 
 MainWindow::~MainWindow() {
@@ -36,7 +38,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
+    if (event->key() == Qt::Key_Escape) {
         QApplication::quit();
     } else if (event->key() == Qt::Key_C) {
         if (socket->isOpen()) {
@@ -45,151 +47,162 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
         qDebug() << "Connecting,..";
         socket->connectToHost("localhost", 9001);
-        if(!socket->waitForConnected(1000)) {
+        if (!socket->waitForConnected(1000)) {
             qDebug() << "Error: " << socket->errorString();
         }
-    } else if (event->key() == Qt::Key_T) {
-        QJsonObject jsonObject;
-        jsonObject.insert("IMEI","333");
-        jsonObject.insert("x",60.74688720703125);
-        jsonObject.insert("y",157.34439086914062);
-        jsonObject.insert("id",0);
-        jsonObject.insert("type",0);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",80.63599395751953);
-        jsonObject.insert("y",157.34439086914062);
-        jsonObject.insert("type",2);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",100.63599395751953);
-        jsonObject.insert("y",157.34439086914062);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",125.36514282226562);
-        jsonObject.insert("y",154.35684204101562);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",152.36514282226562);
-        jsonObject.insert("y",154.35684204101562);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",122.36514282226562);
-        jsonObject.insert("y",154.35684204101562);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",97.35906219482422);
-        jsonObject.insert("y",153.97341918945312);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",82.65560150146484);
-        jsonObject.insert("y",153.36099243164062);
-        jsonObject.insert("type",1);
-        list.push_back(jsonObject);
-
-
-        // NEW TOUCH
-        jsonObject.insert("IMEI","888");
-        jsonObject.insert("x",60.74688720703125);
-        jsonObject.insert("y",157.34439086914062);
-        jsonObject.insert("id",0);
-        jsonObject.insert("type",0);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",80.63599395751953);
-        jsonObject.insert("y",157.34439086914062);
-        jsonObject.insert("type",2);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",100.63599395751953);
-        jsonObject.insert("y",157.34439086914062);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",125.36514282226562);
-        jsonObject.insert("y",154.35684204101562);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",152.36514282226562);
-        jsonObject.insert("y",154.35684204101562);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",122.36514282226562);
-        jsonObject.insert("y",154.35684204101562);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",97.35906219482422);
-        jsonObject.insert("y",153.97341918945312);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",82.65560150146484);
-        jsonObject.insert("y",153.36099243164062);
-        jsonObject.insert("type",1);
-        list.push_back(jsonObject);
-
-        // NEW TOUCH
-        jsonObject.insert("IMEI","777");
-        jsonObject.insert("x",10.0);
-        jsonObject.insert("y",10.0);
-        jsonObject.insert("id",0);
-        jsonObject.insert("type",0);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",120.0);
-        jsonObject.insert("y",120.0);
-        jsonObject.insert("type",2);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",230.0);
-        jsonObject.insert("y",230.0);
-        jsonObject.insert("type",2);
-        list.push_back(jsonObject);
-        jsonObject.insert("x",230.0);
-        jsonObject.insert("y",230.0);
-        jsonObject.insert("type",1);
-        list.push_back(jsonObject);
-
-        // NEW TOUCH
-        jsonObject.insert("IMEI","111");
-        jsonObject.insert("x",10.0);
-        jsonObject.insert("y",10.0);
-        jsonObject.insert("id",0);
-        jsonObject.insert("type",0);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",120.0);
-        jsonObject.insert("y",120.0);
-        jsonObject.insert("type",2);
-        list.push_back(jsonObject);
-
-        jsonObject.insert("x",230.0);
-        jsonObject.insert("y",230.0);
-        jsonObject.insert("type",2);
-        list.push_back(jsonObject);
-        jsonObject.insert("x",230.0);
-        jsonObject.insert("y",230.0);
-        jsonObject.insert("type",1);
-        list.push_back(jsonObject);
-
-        QTimer::singleShot(250, this, SLOT(dummy_touch()));
-
-    } else if (event->key() == Qt::Key_S) {
-        if (socket->isOpen()) {
-//            QPixmap pix(":/imgs/settings.png");
-//            pix = pix.scaled(128,128);
-//            QByteArray data(128*128*3 + 2 + 1,'\n');
-//            data[0] = (unsigned int) 128;
-//            data[1] = (unsigned int) 128;
-//            int k = 2;
-//            for (int pix_x = 0; pix_x < pix.width(); pix_x++) {
-//                for (int pix_y = 0; pix_y < pix.height(); pix_y++) {
-//                    QRgb pixel = pix.toImage().pixel(pix_x,pix_y);
-//                    data[k] = (unsigned int) ((pixel >> 16) & 0xff); k++;
-//                    data[k] = (unsigned int) ((pixel >> 8) & 0xff); k++;
-//                    data[k] = (unsigned int) (pixel & 0xff); k++;
-//                }
-//            }
-//            socket->write(data);
-        }
+    } else if (event->key() == Qt::Key_0) {
+        CellsStates::getInstance()->setKeyWord("");
+        custom_msg = "";
+    } else if (event->key() == Qt::Key_9) {
+        CellsStates::getInstance()->setKeyWord("conf9");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":0,\"max_x\":0,\"min_y\":0,\"max_y\":0,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274564\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":null,\"W\":null}}"\
+                      "},{"\
+                        "\"min_x\":0,\"max_x\":0,\"min_y\":0,\"max_y\":0,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":null,\"W\":null}}"\
+                      "},{"\
+                        "\"min_x\":0,\"max_x\":0,\"min_y\":0,\"max_y\":0,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061243744\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":null,\"W\":null}}"\
+                      "},{"\
+                        "\"min_x\":0,\"max_x\":0,\"min_y\":0,\"max_y\":0,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274492\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":null,\"W\":null}}"\
+                      "},{"\
+                        "\"min_x\":0,\"max_x\":0,\"min_y\":0,\"max_y\":0,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061243843\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":null,\"W\":null}}"\
+                      "},{"\
+                        "\"min_x\":0,\"max_x\":0,\"min_y\":0,\"max_y\":0,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274655\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":null,\"W\":null}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_1) {
+        CellsStates::getInstance()->setKeyWord("conf1");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":0,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":\"354082061243843\",\"W\":null},"\
+                              "\"354082061243843\":{\"x\":1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243744\",\"S\":\"354082061274564\",\"E\":null,\"W\":\"354082061274492\"},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_2) {
+        CellsStates::getInstance()->setKeyWord("conf2");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":0,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":\"354082061243843\",\"W\":null},"\
+                              "\"354082061243843\":{\"x\":1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243744\",\"S\":\"354082061274564\",\"E\":null,\"W\":\"354082061274492\"},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_3) {
+        CellsStates::getInstance()->setKeyWord("conf3");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":0,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":\"354082061243843\",\"W\":null},"\
+                              "\"354082061243843\":{\"x\":1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243744\",\"S\":\"354082061274564\",\"E\":null,\"W\":\"354082061274492\"},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_4) {
+        CellsStates::getInstance()->setKeyWord("conf4");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":0,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":\"354082061243843\",\"W\":null},"\
+                              "\"354082061243843\":{\"x\":1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243744\",\"S\":\"354082061274564\",\"E\":null,\"W\":\"354082061274492\"},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_5) {
+        CellsStates::getInstance()->setKeyWord("conf5");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":-1,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":null,\"W\":\"354082061243843\"},"\
+                              "\"354082061243843\":{\"x\":-1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":\"354082061274492\",\"W\":null},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_6) {
+        CellsStates::getInstance()->setKeyWord("conf6");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":-1,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":null,\"W\":\"354082061243843\"},"\
+                              "\"354082061243843\":{\"x\":-1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":\"354082061274492\",\"W\":null},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_7) {
+        CellsStates::getInstance()->setKeyWord("conf7");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":-1,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":null,\"W\":\"354082061243843\"},"\
+                              "\"354082061243843\":{\"x\":-1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":\"354082061274492\",\"W\":null},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
+    } else if (event->key() == Qt::Key_8) {
+        CellsStates::getInstance()->setKeyWord("conf8");
+        custom_msg = QString("{"\
+          "\"devices\":[{"\
+                        "\"min_x\":-1,\"max_x\":1,\"min_y\":0,\"max_y\":2,\"min_z\":0,\"max_z\":0,"\
+                        "\"connections\":{"\
+                              "\"354082061274638\":{\"x\":0,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061274492\",\"E\":\"354082061243744\",\"W\":null},"\
+                              "\"354082061243744\":{\"x\":1,\"y\":0,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":\"354082061243843\",\"E\":null,\"W\":\"354082061274638\"},"\
+                              "\"354082061274492\":{\"x\":0,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274638\",\"S\":\"354082061274655\",\"E\":null,\"W\":\"354082061243843\"},"\
+                              "\"354082061243843\":{\"x\":-1,\"y\":1,\"z\":0,\"B\":null,\"T\":null,\"N\":null,\"S\":null,\"E\":\"354082061274492\",\"W\":null},"\
+                              "\"354082061274655\":{\"x\":0,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061274492\",\"S\":null,\"E\":\"354082061274564\",\"W\":null},"\
+                              "\"354082061274564\":{\"x\":1,\"y\":2,\"z\":0,\"B\":null,\"T\":null,\"N\":\"354082061243843\",\"S\":null,\"E\":null,\"W\":\"354082061274655\"}}"\
+                      "}],"\
+          "\"watches\":[\"354082061274638\",\"354082061243744\",\"354082061274492\",\"354082061243843\",\"354082061274655\",\"354082061274564\"]}");
+        readyRead();
     }
 }
 
@@ -236,6 +249,16 @@ void MainWindow::bytesWritten(qint64 bytes) {
 
 void MainWindow::readyRead() {
     qDebug() << "Reading...";
+    if (custom_msg != "") {
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(custom_msg.toUtf8());
+        QJsonObject jsonObject = jsonResponse.object();
+        CellsStates *states = CellsStates::getInstance();
+        states->setJsonStates(jsonObject);
+        states->updateStates();
+
+        return;
+    }
+
     QByteArray msg = socket->readAll();
 
     if (msg.length()>5) {

@@ -35,7 +35,11 @@ SOURCES += \
     view/widgets/button.cpp \
     view/scenes/testscene.cpp \
     view/scenes/colorscene.cpp \
-    view/widgets/swatch.cpp
+    view/widgets/swatch.cpp \
+    view/scenes/socialscene.cpp \
+    view/scenes/lockscene.cpp \
+    view/scenes/artscene.cpp \
+    view/scenes/checkscene.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,7 +53,11 @@ HEADERS += \
     view/scenes/scene.h \
     view/scenes/testscene.h \
     view/scenes/colorscene.h \
-    view/widgets/swatch.h
+    view/widgets/swatch.h \
+    view/scenes/socialscene.h \
+    view/scenes/lockscene.h \
+    view/scenes/artscene.h \
+    view/scenes/checkscene.h
 
 FORMS += \
         mainwindow.ui

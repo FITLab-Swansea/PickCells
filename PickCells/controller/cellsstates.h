@@ -51,6 +51,9 @@ public:
 
     QList<Brick*> _bricks_to_delete;
 
+    void setKeyWord(QString keyword) { kw = keyword; }
+    QString getKeyWord() { return kw; }
+
 signals:
     void new_configuration(QString);
     void visualUpdate(QString,QPixmap*);
@@ -81,6 +84,8 @@ private:
 
     bool json_set;
     QJsonObject json_states;
+
+    QString kw;
 };
 
 #endif // CELLSSTATES_H
