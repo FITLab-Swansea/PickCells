@@ -1,9 +1,5 @@
 package com.example.alixgoguey.pickcellsandroid19;
 
-/**
- * Created by alixgoguey on 29/05/2018.
- */
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,12 +23,12 @@ public class CommunicationModule {
 
     String IMEI = null;
     Socket socket;
-    MainActivity _main_act = null;
-    SidesDebug _side_debug = null;
+    MainActivity _main_act;
+    SidesDebug _side_debug;
 
     JSONArray obj_buff;
     String watch_id = "";
-    long touch_framerate_ms = (long) -1;
+    long touch_framerate_ms = -1;
 
     int new_north = 0;
     int new_east  = 1;
@@ -101,11 +97,11 @@ public class CommunicationModule {
                 try {
                     watch_id = obj.getString("id"); // get node server ID
                     obj = obj.getJSONObject("params"); // get parameters
-                    touch_framerate_ms = (long) (1000 / Integer.parseInt(obj.getString("touch_framerate")));
+                    touch_framerate_ms = 1000 / Integer.parseInt(obj.getString("touch_framerate"));
                 } catch (JSONException e) {
                     obj = null;
                     watch_id = "";
-                    touch_framerate_ms = (long) -1;
+                    touch_framerate_ms = -1;
                 }
 
                 obj = (JSONObject) args[0];

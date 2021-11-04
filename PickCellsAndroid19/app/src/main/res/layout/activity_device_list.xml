@@ -1,80 +1,79 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
 
-    android:background="#3c3f41"
-    tools:context=".DeviceList"
-    tools:layout_editor_absoluteY="25dp">
+	android:background="#3c3f41"
+	tools:context=".DeviceList"
+	tools:layout_editor_absoluteY="25dp">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="13dp"
-        android:layout_marginTop="2dp"
-        android:text="Bluetooth Devices Paired"
-        android:textColor="#ffffff"
-        android:textIsSelectable="false"
-        app:layout_constraintBottom_toTopOf="@+id/listView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+	<TextView
+		android:id="@+id/textView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="2dp"
+		android:layout_marginBottom="13dp"
+		android:text="Bluetooth Devices Paired"
+		android:textColor="#ffffff"
+		android:textIsSelectable="false"
+		app:layout_constraintBottom_toTopOf="@+id/listView"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="9dp"
-        android:layout_marginEnd="13dp"
-        android:layout_marginStart="13dp"
-        android:background="#3858e7"
-        android:text="Bluetooth"
-        app:layout_constraintBottom_toTopOf="@+id/debug_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listView" />
+	<Button
+		android:id="@+id/button"
+		android:layout_width="0dp"
+		android:layout_height="56dp"
+		android:layout_marginStart="13dp"
+		android:layout_marginEnd="13dp"
+		android:layout_marginBottom="9dp"
+		android:background="#3858e7"
+		android:text="Bluetooth"
+		app:layout_constraintBottom_toTopOf="@+id/debug_button"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/listView" />
 
-    <Button
-        android:id="@+id/skip_button"
-        android:layout_width="184dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="15dp"
-        android:background="#e75238"
-        android:text="Skip"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/debug_button" />
+	<Button
+		android:id="@+id/skip_button"
+		android:layout_width="184dp"
+		android:layout_height="48dp"
+		android:layout_marginBottom="15dp"
+		android:background="#e75238"
+		android:text="Skip"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/debug_button" />
 
-    <Button
-        android:id="@+id/debug_button"
-        android:layout_width="0dp"
-        android:layout_height="49dp"
-        android:layout_marginBottom="9dp"
-        android:layout_marginEnd="17dp"
-        android:layout_marginStart="17dp"
-        android:background="#e75238"
-        android:text="Debug"
-        app:layout_constraintBottom_toTopOf="@+id/skip_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+	<Button
+		android:id="@+id/debug_button"
+		android:layout_width="0dp"
+		android:layout_height="49dp"
+		android:layout_marginStart="17dp"
+		android:layout_marginEnd="17dp"
+		android:layout_marginBottom="9dp"
+		android:background="#e75238"
+		android:text="Debug"
+		app:layout_constraintBottom_toTopOf="@+id/skip_button"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/button" />
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="368dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="18dp"
-        android:background="#f8f8f8"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+	<ListView
+		android:id="@+id/listView"
+		android:layout_width="368dp"
+		android:layout_height="0dp"
+		android:layout_marginBottom="18dp"
+		android:background="#f8f8f8"
+		android:scrollbars="vertical"
+		app:layout_constraintBottom_toTopOf="@+id/button"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.5"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/textView">
 
+	</ListView>
 
-    </ListView>
-
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
