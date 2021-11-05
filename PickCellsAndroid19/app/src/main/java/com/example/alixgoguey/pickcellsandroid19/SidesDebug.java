@@ -6,9 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.constraint.ConstraintLayout;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -17,6 +15,8 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class SidesDebug extends Activity implements View.OnClickListener{
     Button btnNorth, btnSouth, btnEast, btnWest, btnBottom, btnTop;
@@ -52,9 +52,9 @@ public class SidesDebug extends Activity implements View.OnClickListener{
         setButtons();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        cubeIDLable = (TextView) findViewById(R.id.cube_id);
+        cubeIDLable = findViewById(R.id.cube_id);
 
-        layout = (ConstraintLayout) findViewById(R.id.bug_layout);
+        layout = findViewById(R.id.bug_layout);
 
         com = new CommunicationModule(null, this);
     }

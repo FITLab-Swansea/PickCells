@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     RelativeLayout layout;
 
     CommunicationModule com = null;
-    Map<Integer, Long> framerate_map = new HashMap<Integer, Long>();
+    Map<Integer, Long> framerate_map = new HashMap<>();
 
     String IMEI = null;
 

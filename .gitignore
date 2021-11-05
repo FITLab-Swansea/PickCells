@@ -1,4 +1,4 @@
 .DS_Store
 Server/node_modules
-build-PickCells-Qt_6_2_1_for_macOS-Debug/
 PickCells/PickCells.pro.user
+build-*
